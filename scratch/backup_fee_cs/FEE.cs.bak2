@@ -1,0 +1,1226 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Data.OleDb;
+using System.Data;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data.SqlClient;
+using System.Configuration;
+
+namespace School._class
+{
+
+    public class FEE
+    {
+
+        SYSTEMSETTING SYS = new SYSTEMSETTING();
+        DataSet rs = new DataSet();
+        List<string> myListofQueries = new List<string>();
+        string QUERY = null;
+        Boolean CHECK = false;
+
+        public string GetMasterID()
+        {
+            string MASTERID = "";
+            rs = SYS.Show_Query(" select max(convert(int,FEE_MASTER_ID))+1 as ids from FEE_MASTER where SESSIONID='" + SYSTEMSETTING.sessionid + "'");
+            foreach (DataRow RowDocument in rs.Tables[0].Rows)
+            {
+                MASTERID = RowDocument[0].ToString();
+            }
+            if (MASTERID == "")
+                MASTERID = "1";
+
+            return MASTERID;
+
+        }
+        public string GetDETAILID()
+        {
+            string MASTERID = "";
+            rs = SYS.Show_Query(" select max(convert(int,FEE_DETAIL_ID))+1 as ids from FEE_DETAIL");
+            foreach (DataRow RowDocument in rs.Tables[0].Rows)
+            {
+                MASTERID = RowDocument[0].ToString();
+            }
+            if (MASTERID == "")
+                MASTERID = "1";
+
+            return MASTERID;
+
+        }
+
+        public void generatefee(string classid, string month, string SHIFT, string studentid, string DUE_DATE, string remarks)
+        {
+            try
+            {
+                string concessionfee = "";
+                string amount = "";
+                string master_id = GetMasterID();
+                double tamount = 0;
+
+
+                if (studentid == "")
+                {
+                    QUERY = "Select * from [student] where [c_id] ='" + classid + "' and [active]='true' and SHIFT='" + SHIFT + "' AND SessionID='" + SYSTEMSETTING.sessionid + "' and branch_id = '" + SYSTEMSETTING.branch_ID + "' and [s_id] NOT IN (Select [s_id] from [FEE_MASTER] where [c_id] ='" + classid + "' and [FEE_MONTH]='" + month + "' AND SHIFT ='" + SHIFT + "' AND SessionID='" + SYSTEMSETTING.sessionid + "' and branch_id = '" + SYSTEMSETTING.branch_ID + "')";
+                }
+                else
+                {
+                    QUERY = "Select * from [student] where [c_id] ='" + classid + "' and [active]='true' and SHIFT='" + SHIFT + "' AND SessionID='" + SYSTEMSETTING.sessionid + "' and branch_id = '" + SYSTEMSETTING.branch_ID + "' and s_id='" + studentid + "' and [s_id] NOT IN (Select [s_id] from [FEE_MASTER] where [c_id] ='" + classid + "' and [FEE_MONTH]='" + month + "' AND SHIFT ='" + SHIFT + "' AND SessionID='" + SYSTEMSETTING.sessionid + "' and branch_id = '" + SYSTEMSETTING.branch_ID + "')";
+                }
+
+                rs = SYS.Show_Query(QUERY);
+                foreach (DataRow RowDocument in rs.Tables[0].Rows)
+                {
+
+                    //---- Fee Master ---------
+
+                    //Guid guid = Guid.NewGuid()
+                    string barcode = System.Guid.NewGuid().ToString();
+                    bool buscharges = Convert.ToBoolean(RowDocument["buscharges"]);
+                    barcode = barcode.Substring(0, 3);
+                    barcode = "*" + barcode + master_id + "*";
+
+                    concessionfee = RowDocument["CONCESSION_FEE"].ToString();
+                    tamount = 0;
+
+                    if (concessionfee == "")
+                    {
+                        concessionfee = "0";
+                    }
+
+                    QUERY = "Insert into FEE_MASTER(FEE_MASTER_ID,s_id,C_ID,FEE_MONTH,SHIFT,FEE_MONTH_FROM,SESSIONID,DUE_DATE,BARCODE,REMARKS,BRANCH_ID) VALUES('" + master_id + "','" + RowDocument["s_id"].ToString() + "','" + classid + "','" + month + "','" + SHIFT + "','" + month + "','" + SYSTEMSETTING.sessionid + "','" + DUE_DATE + "','" + barcode + "','" + remarks + "','" + SYSTEMSETTING.branch_ID + "')";
+                    myListofQueries.Add(QUERY);
+
+
+                    //---- Fee Detail ---------
+                    Dictionary<string, double> feeDetailsMap = new Dictionary<string, double>();
+
+                    double stdConcession = 0;
+                    double.TryParse(concessionfee, out stdConcession);
+                    bool concessionHeadFound = false;
+
+                    QUERY = "Select fc.*, fh.Fee_head, fh.Category from FEE_CLASS fc INNER JOIN Fee_Head fh ON fc.Fee_head_id = fh.Fee_head_id WHERE fc.C_ID='" + classid + "' and fc.ACTIVE='true' AND fc.TYPE='" + RowDocument["TYPE"].ToString() + "' Order by fc.Fee_head_id";
+                    rs = SYS.Show_Query(QUERY);
+                    foreach (DataRow Row_Inner in rs.Tables[0].Rows)
+                    {
+                        string headId = Row_Inner["Fee_head_id"].ToString();
+                        double famt = Convert.ToDouble(Row_Inner["AMOUNT"]);
+                        string headName = (Row_Inner["Fee_head"] != DBNull.Value) ? Row_Inner["Fee_head"].ToString().Trim().ToUpper() : "";
+                        string cat = (Row_Inner["Category"] != DBNull.Value) ? Row_Inner["Category"].ToString().Trim().ToUpper() : "";
+                        bool isConcessionHead = (cat == "DISCOUNT" || cat == "CONCESSION" || headName.Contains("CONCESSION"));
+                        bool isArrearHead = (cat == "ARREAR" || headName.Contains("ARREAR"));
+
+                        if (isArrearHead)
+                        {
+                            // Arrears are calculated dynamically from genuine student balance, not as static class charges
+                            continue;
+                        }
+
+                        // BUS CHARGES
+                        if (headId == "19")
+                        {
+                            if (buscharges == true)
+                            {
+                                feeDetailsMap[headId] = famt;
+                            }
+                        }
+                        else if (isConcessionHead)
+                        {
+                            concessionHeadFound = true;
+                            if (stdConcession > 0)
+                            {
+                                famt = -(Math.Abs(famt) + stdConcession);
+                            }
+                            feeDetailsMap[headId] = famt;
+                        }
+                        else
+                        {
+                            feeDetailsMap[headId] = famt;
+                        }
+                    }
+
+                    if (stdConcession > 0 && !concessionHeadFound)
+                    {
+                        string qBranchConc = "SELECT TOP 1 Fee_head_id FROM Fee_Head WHERE branch_id = '" + SYSTEMSETTING.branch_ID + "' AND (Category IN ('DISCOUNT', 'CONCESSION') OR UPPER(Fee_head) LIKE '%CONCESSION%') ORDER BY CASE WHEN UPPER(LTRIM(RTRIM(Fee_head))) = 'FEE CONCESSION' THEN 1 WHEN UPPER(LTRIM(RTRIM(Fee_head))) LIKE '%CONCESSION%' THEN 2 ELSE 3 END, Fee_head_id";
+                        DataSet dsBranchConc = SYS.Show_Query(qBranchConc);
+                        if (dsBranchConc != null && dsBranchConc.Tables.Count > 0 && dsBranchConc.Tables[0].Rows.Count > 0)
+                        {
+                            string branchConcHeadId = dsBranchConc.Tables[0].Rows[0]["Fee_head_id"].ToString();
+                            feeDetailsMap[branchConcHeadId] = -stdConcession;
+                        }
+                    }
+
+                    //---- Fine & Concession / Discount Adjustment ---------
+                    string admNoSingle = (RowDocument.Table.Columns.Contains("ADMISSION_NO") && RowDocument["ADMISSION_NO"] != DBNull.Value) ? RowDocument["ADMISSION_NO"].ToString().Trim().Replace("'", "''") : "";
+                    string sidSingle = RowDocument["s_id"].ToString().Trim().Replace("'", "''");
+
+                    QUERY = "SELECT b.FINE_ID, b.Fee_head_id, b.FINE_AMOUNT, a.Category, a.Fee_head " +
+                            "FROM FINE_HISTORY b " +
+                            "INNER JOIN Fee_Head a ON b.Fee_head_id = a.Fee_head_id " +
+                            "WHERE (b.S_ID = '" + sidSingle + "'" + (!string.IsNullOrEmpty(admNoSingle) ? " OR b.S_ID = '" + admNoSingle + "'" : "") + ") " +
+                            "  AND (b.active = 'Y' OR b.active LIKE 'Y%') " +
+                            "  AND (b.FEE_MASTER_ID IS NULL OR b.FEE_MASTER_ID = '') " +
+                            "  AND b.SessionID = '" + SYSTEMSETTING.sessionid + "' " +
+                            "  AND b.branch_id = '" + SYSTEMSETTING.branch_ID + "' " +
+                            "  AND (LTRIM(RTRIM(b.FEE_MONTH)) = '" + month.Trim() + "' OR b.FEE_MONTH = '' OR b.FEE_MONTH IS NULL)";
+                    rs = SYS.Show_Query(QUERY);
+                    if (rs != null && rs.Tables.Count > 0)
+                    {
+                        foreach (DataRow Row_Fine in rs.Tables[0].Rows)
+                        {
+                            string fineId = Row_Fine["FINE_ID"].ToString();
+                            string feeHeadId = Row_Fine["Fee_head_id"].ToString();
+                            string category = (Row_Fine["Category"] != DBNull.Value) ? Row_Fine["Category"].ToString().Trim().ToUpper() : "";
+                            double fineAmt = 0;
+                            if (Row_Fine["FINE_AMOUNT"] != DBNull.Value)
+                            {
+                                double.TryParse(Row_Fine["FINE_AMOUNT"].ToString(), out fineAmt);
+                            }
+                            if (fineAmt > 0)
+                            {
+                                if (category == "DISCOUNT" || category == "CONCESSION")
+                                {
+                                    // Fee Concession / Discount reduces payable fee
+                                    if (feeDetailsMap.ContainsKey(feeHeadId))
+                                    {
+                                        if (feeDetailsMap[feeHeadId] <= 0)
+                                        {
+                                            feeDetailsMap[feeHeadId] = -(Math.Abs(feeDetailsMap[feeHeadId]) + fineAmt);
+                                        }
+                                        else
+                                        {
+                                            feeDetailsMap[feeHeadId] = -fineAmt;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        feeDetailsMap[feeHeadId] = -fineAmt;
+                                    }
+                                }
+                                else
+                                {
+                                    // Fine adds to payable fee
+                                    if (feeDetailsMap.ContainsKey(feeHeadId))
+                                    {
+                                        feeDetailsMap[feeHeadId] += fineAmt;
+                                    }
+                                    else
+                                    {
+                                        feeDetailsMap[feeHeadId] = fineAmt;
+                                    }
+                                }
+
+                                QUERY = "Update FINE_HISTORY set active='N', FEE_MASTER_ID='" + master_id + "' where FINE_ID='" + fineId + "' AND SessionID='" + SYSTEMSETTING.sessionid + "' and branch_id='" + SYSTEMSETTING.branch_ID + "'";
+                                myListofQueries.Add(QUERY);
+                            }
+                        }
+                    }
+
+                    // Insert unique FEE_DETAIL records (preventing duplicate lines)
+                    foreach (KeyValuePair<string, double> kvp in feeDetailsMap)
+                    {
+                        string headId = kvp.Key;
+                        double detailAmt = kvp.Value;
+
+                        QUERY = "Insert into FEE_DETAIL(FEE_MASTER_ID,Fee_head_id,AMOUNT,FEE_MONTH,ISCURRENT,BALANCE,FEE_MONTH_FROM,SESSIONID,branch_id) VALUES(" + master_id + "," + headId + "," + detailAmt + ",'" + month + "','Y','" + detailAmt + "','" + month + "','" + SYSTEMSETTING.sessionid + "','" + SYSTEMSETTING.branch_ID + "')";
+                        myListofQueries.Add(QUERY);
+
+                        tamount = tamount + detailAmt;
+                    }
+
+                    //#region
+                    ////---- Previous Balance  OLD METHOD---------
+                    //string PRVBALANCE = "";
+                    //double tprvbal = 0;
+
+                    //QUERY = "SELECT BALANCE,FEE_MASTER_ID FROM FEE_MASTER WHERE (BALANCE) >0 and s_id='" + RowDocument["s_id"].ToString() + "' AND PAID IS NULL AND SESSIONID ='" + SYSTEMSETTING.sessionid + "'";
+                    //rs = SYS.Show_Query(QUERY);
+                    //foreach (DataRow Row_FM in rs.Tables[0].Rows)
+                    //{
+                    //    PRVBALANCE = Row_FM[0].ToString();
+
+
+
+
+                    //    QUERY = "UPDATE FEE_MASTER SET PAID='N' where FEE_MASTER_ID='" + Row_FM[1].ToString() + "' AND SESSIONID='" + SYSTEMSETTING.sessionid + "'";
+                    //    myListofQueries.Add(QUERY);
+
+                    //    tprvbal = tprvbal + Convert.ToDouble(PRVBALANCE);
+                    //}
+
+                    //if (PRVBALANCE == "")
+                    //{ }
+                    //else
+                    //{
+
+
+                    //    QUERY = "Insert into FEE_DETAIL(FEE_MASTER_ID,Fee_head_id,AMOUNT,FEE_MONTH,ISCURRENT,BALANCE,FEE_MONTH_FROM,SESSIONID) VALUES(" + master_id + ",'3'," + PRVBALANCE + ",'" + month + "','N','" + PRVBALANCE + "','" + month + "','" + SYSTEMSETTING.sessionid + "')";
+                    //    myListofQueries.Add(QUERY);
+                    //    tamount = tamount + (Convert.ToDouble(PRVBALANCE));
+                    //}
+                    //#endregion
+
+
+                    #region
+                    //---- Previous Balance (Read-Only Arrears Carry Forward) ---------
+                    double tprvbal = GetPreviousOutstandingArrears(RowDocument["s_id"].ToString(), month, master_id, SYSTEMSETTING.branch_ID, SYSTEMSETTING.sessionid);
+                    if (tprvbal > 0)
+                    {
+                        string arrearHeadId = GetBranchArrearHeadId(SYSTEMSETTING.branch_ID);
+                        QUERY = "Insert into FEE_DETAIL(FEE_MASTER_ID,Fee_head_id,AMOUNT,FEE_MONTH,ISCURRENT,BALANCE,FEE_MONTH_FROM,SESSIONID,branch_id) VALUES(" + master_id + ",'" + arrearHeadId + "'," + tprvbal + ",'" + month + "','N'," + tprvbal + ",'" + month + "','" + SYSTEMSETTING.sessionid + "','" + SYSTEMSETTING.branch_ID + "')";
+                        myListofQueries.Add(QUERY);
+                        tamount = tamount + tprvbal;
+                    }
+                    #endregion
+
+
+                    //Update fine status and fee month
+                    //QUERY = "Update FINE Set STATUS='R', FEE_MONTH='" & ddlmonth.SelectedItem.ToString() & "' WHERE SCHOOL_ID='" & Session("SCHOOL_ID") & "' AND BRANCH_ID='" & Session("BRANCH_ID") & "' AND CLASS_SEC='" & ddlclass.SelectedValue & "' and STUDENT_ID='" & Row_std(0) & "' ";
+                    //myListofQueries.Add(QUERY);
+
+                    QUERY = "Update FEE_MASTER Set RECEIVABLE_AMOUNT='" + tamount + "', BALANCE='" + tamount + "' WHERE FEE_MASTER_ID='" + master_id + "' AND SESSIONID='" + SYSTEMSETTING.sessionid + "' and branch_id = '" + SYSTEMSETTING.branch_ID + "'";
+                    myListofQueries.Add(QUERY);
+
+
+                    master_id = (Convert.ToInt64(master_id) + 1).ToString();
+                }
+
+
+                if (myListofQueries.Count > 0)
+                {
+                    string[] bulkqueries1 = myListofQueries.ToArray();
+                    CHECK = SYS.Insert_Query_manualcommit(bulkqueries1);
+
+                    if (CHECK == true)
+                    {
+                        SYS.setMessageBox("Fee Generated Generated", 1);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Fee Not Generated!");
+                    }
+                }
+
+                // Also check and apply any pending fines for students with existing vouchers
+                ApplyPendingFinesForClassOrStudents(classid, month, month, SHIFT, "", studentid);
+
+            }
+            catch (Exception exp)
+            {
+                SYS.setMessageBox(exp.Message, 3);
+            }
+
+
+
+        }
+
+        public void generatefeeMulti(string classid, string month, string SHIFT, string studentid, int months, string monthfrom, string DUE_DATE, string tmonths, string tfine, string remarks, string ISSUE_DATE, string startdate, string enddate, string sectionID)
+        {
+            try
+            {
+                string concessionfee = "";
+                string amount = "";
+                string master_id = GetMasterID();
+                double tamount = 0;
+                double famount = 0;
+                bool multitag = false;
+
+                if (studentid == "")
+                {
+                    QUERY = "Select * from [student] where [c_id] ='" + classid + "' and [active]='true' and SHIFT='" + SHIFT + "' and SessionID='" + SYSTEMSETTING.sessionid + "'  and branch_id='" + SYSTEMSETTING.branch_ID + "' AND SECTION_ID='" + sectionID + "' and [s_id] NOT IN (Select [s_id] from [FEE_MASTER] where [c_id] ='" + classid + "' and [FEE_MONTH]='" + month + "' AND SHIFT ='" + SHIFT + "' AND SESSIONID='" + SYSTEMSETTING.sessionid + "'  and branch_id='" + SYSTEMSETTING.branch_ID + "')";
+                }
+                else
+                {
+                    QUERY = "Select * from [student] where [c_id] ='" + classid + "' and [active]='true' and SHIFT='" + SHIFT + "' and SessionID='" + SYSTEMSETTING.sessionid + "'  and branch_id='" + SYSTEMSETTING.branch_ID + "' AND SECTION_ID='" + sectionID + "' and s_id='" + studentid + "' and [s_id] NOT IN (Select [s_id] from [FEE_MASTER] where [c_id] ='" + classid + "' and [FEE_MONTH]='" + month + "' AND SHIFT ='" + SHIFT + "'AND SESSIONID='" + SYSTEMSETTING.sessionid + "'  and branch_id='" + SYSTEMSETTING.branch_ID + "')";
+                }
+
+                rs = SYS.Show_Query(QUERY);
+                foreach (DataRow RowDocument in rs.Tables[0].Rows)
+                {
+
+                    //---- Fee Master ---------
+
+
+                    //string barcode = System.Guid.NewGuid().ToString();
+                    //barcode = barcode.Substring(0, 13);
+                    //barcode = barcode + master_id;
+
+
+                    string barcode = System.Guid.NewGuid().ToString();
+                    string buscharges = RowDocument["buscharges"].ToString();
+                    bool buscharge = false;
+                    if (!string.IsNullOrEmpty(buscharges))
+                    {
+                        buscharge = Convert.ToBoolean(buscharges);
+                    }
+
+
+                    barcode = barcode.Substring(0, 3);
+                    barcode = "*" + barcode + master_id + "*";
+
+
+                    concessionfee = RowDocument["CONCESSION_FEE"].ToString();
+                    tamount = 0;
+
+                    if (concessionfee == "")
+                    {
+                        concessionfee = "0";
+                    }
+
+                    QUERY = "Insert into FEE_MASTER(FEE_MASTER_ID,s_id,C_ID,FEE_MONTH,SHIFT,FEE_MONTH_FROM,MULTITAG,SessionID,DUE_DATE,T_MONTHS,FINE_AFTER_DUE_DATE,BARCODE,BRANCH_ID,REMARKS,ISSUE_DATE,startdate,enddate) VALUES('" + master_id + "','" + RowDocument["s_id"].ToString() + "','" + classid + "','" + month + "','" + SHIFT + "','" + monthfrom + "','Y','" + SYSTEMSETTING.sessionid + "','" + DUE_DATE + "','" + tmonths + "','" + tfine + "','" + barcode + "','" + SYSTEMSETTING.branch_ID + "','" + remarks + "','" + ISSUE_DATE + "','" + startdate + "','" + enddate + "')";
+                    myListofQueries.Add(QUERY);
+
+
+                    //---- Fee Detail ---------
+                    Dictionary<string, double> feeDetailsMap = new Dictionary<string, double>();
+
+                    double stdConcession = 0;
+                    double.TryParse(concessionfee, out stdConcession);
+                    bool concessionHeadFound = false;
+
+                    //and AMOUNT <> 0 Remove from 9 April 2025
+                    QUERY = "Select fc.*, fh.Fee_head, fh.Category from FEE_CLASS fc INNER JOIN Fee_Head fh ON fc.Fee_head_id = fh.Fee_head_id WHERE fc.C_ID='" + classid + "' and fc.ACTIVE='true' AND fc.TYPE='" + RowDocument["TYPE"].ToString() + "' Order by fc.Fee_head_id";
+                    rs = SYS.Show_Query(QUERY);
+                    foreach (DataRow Row_Inner in rs.Tables[0].Rows)
+                    {
+
+                        if (Row_Inner["ISMULTIPLY"].ToString() == "" || Row_Inner["ISMULTIPLY"].ToString() == string.Empty)
+                        {
+                            multitag = false;
+                        }
+                        else
+                        {
+                            multitag = true;
+                        }
+
+                        //    multitag = Convert.ToBoolean(Row_Inner["ISMULTIPLY"].ToString());
+
+                        if (multitag == true)
+                        {
+                            famount = Convert.ToDouble(Row_Inner["AMOUNT"]) * months;
+                        }
+                        else
+                        {
+                            famount = Convert.ToDouble(Row_Inner["AMOUNT"]);
+                        }
+
+                        string headId = Row_Inner["Fee_head_id"].ToString();
+                        string headName = (Row_Inner["Fee_head"] != DBNull.Value) ? Row_Inner["Fee_head"].ToString().Trim().ToUpper() : "";
+                        string cat = (Row_Inner["Category"] != DBNull.Value) ? Row_Inner["Category"].ToString().Trim().ToUpper() : "";
+                        bool isConcessionHead = (cat == "DISCOUNT" || cat == "CONCESSION" || headName.Contains("CONCESSION"));
+                        bool isArrearHead = (cat == "ARREAR" || headName.Contains("ARREAR"));
+
+                        if (isArrearHead)
+                        {
+                            // Arrears are calculated dynamically from genuine student balance, not as static class charges
+                            continue;
+                        }
+
+                        if (isConcessionHead)
+                        {
+                            concessionHeadFound = true;
+                            if (stdConcession > 0)
+                            {
+                                double concAmt = multitag ? (stdConcession * months) : stdConcession;
+                                famount = -(Math.Abs(famount) + concAmt);
+                            }
+                        }
+
+                        feeDetailsMap[headId] = famount;
+                    }
+
+                    if (stdConcession > 0 && !concessionHeadFound)
+                    {
+                        string qBranchConc = "SELECT TOP 1 Fee_head_id FROM Fee_Head WHERE branch_id = '" + SYSTEMSETTING.branch_ID + "' AND (Category IN ('DISCOUNT', 'CONCESSION') OR UPPER(Fee_head) LIKE '%CONCESSION%') ORDER BY CASE WHEN UPPER(LTRIM(RTRIM(Fee_head))) = 'FEE CONCESSION' THEN 1 WHEN UPPER(LTRIM(RTRIM(Fee_head))) LIKE '%CONCESSION%' THEN 2 ELSE 3 END, Fee_head_id";
+                        DataSet dsBranchConc = SYS.Show_Query(qBranchConc);
+                        if (dsBranchConc != null && dsBranchConc.Tables.Count > 0 && dsBranchConc.Tables[0].Rows.Count > 0)
+                        {
+                            string branchConcHeadId = dsBranchConc.Tables[0].Rows[0]["Fee_head_id"].ToString();
+                            double concAmt = stdConcession * months;
+                            feeDetailsMap[branchConcHeadId] = -concAmt;
+                        }
+                    }
+
+                    //---- Fine & Concession / Discount Adjustment ---------
+                    string admNoMulti = (RowDocument.Table.Columns.Contains("ADMISSION_NO") && RowDocument["ADMISSION_NO"] != DBNull.Value) ? RowDocument["ADMISSION_NO"].ToString().Trim().Replace("'", "''") : "";
+                    string sidMulti = RowDocument["s_id"].ToString().Trim().Replace("'", "''");
+
+                    QUERY = "SELECT b.FINE_ID, b.Fee_head_id, b.FINE_AMOUNT, a.Category, a.Fee_head " +
+                            "FROM FINE_HISTORY b " +
+                            "INNER JOIN Fee_Head a ON b.Fee_head_id = a.Fee_head_id " +
+                            "WHERE (b.S_ID = '" + sidMulti + "'" + (!string.IsNullOrEmpty(admNoMulti) ? " OR b.S_ID = '" + admNoMulti + "'" : "") + ") " +
+                            "  AND (b.active = 'Y' OR b.active LIKE 'Y%') " +
+                            "  AND (b.FEE_MASTER_ID IS NULL OR b.FEE_MASTER_ID = '') " +
+                            "  AND b.SessionID = '" + SYSTEMSETTING.sessionid + "' " +
+                            "  AND b.branch_id = '" + SYSTEMSETTING.branch_ID + "' " +
+                            "  AND (LTRIM(RTRIM(b.FEE_MONTH)) = '" + month.Trim() + "' " +
+                            "       OR LTRIM(RTRIM(b.FEE_MONTH)) = '" + monthfrom.Trim() + "' " +
+                            "       OR (b.FEE_MONTH >= '" + monthfrom.Trim() + "' AND b.FEE_MONTH <= '" + month.Trim() + "') " +
+                            "       OR b.FEE_MONTH = '' OR b.FEE_MONTH IS NULL)";
+                    rs = SYS.Show_Query(QUERY);
+                    if (rs != null && rs.Tables.Count > 0)
+                    {
+                        foreach (DataRow Row_Fine in rs.Tables[0].Rows)
+                        {
+                            string fineId = Row_Fine["FINE_ID"].ToString();
+                            string feeHeadId = Row_Fine["Fee_head_id"].ToString();
+                            string category = (Row_Fine["Category"] != DBNull.Value) ? Row_Fine["Category"].ToString().Trim().ToUpper() : "";
+                            double fineAmt = 0;
+                            if (Row_Fine["FINE_AMOUNT"] != DBNull.Value)
+                            {
+                                double.TryParse(Row_Fine["FINE_AMOUNT"].ToString(), out fineAmt);
+                            }
+                            if (fineAmt > 0)
+                            {
+                                if (category == "DISCOUNT" || category == "CONCESSION")
+                                {
+                                    // Fee Concession / Discount reduces payable fee
+                                    if (feeDetailsMap.ContainsKey(feeHeadId))
+                                    {
+                                        if (feeDetailsMap[feeHeadId] <= 0)
+                                        {
+                                            feeDetailsMap[feeHeadId] = -(Math.Abs(feeDetailsMap[feeHeadId]) + fineAmt);
+                                        }
+                                        else
+                                        {
+                                            feeDetailsMap[feeHeadId] = -fineAmt;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        feeDetailsMap[feeHeadId] = -fineAmt;
+                                    }
+                                }
+                                else
+                                {
+                                    // Fine adds to payable fee
+                                    if (feeDetailsMap.ContainsKey(feeHeadId))
+                                    {
+                                        feeDetailsMap[feeHeadId] += fineAmt;
+                                    }
+                                    else
+                                    {
+                                        feeDetailsMap[feeHeadId] = fineAmt;
+                                    }
+                                }
+
+                                QUERY = "Update FINE_HISTORY set active='N', FEE_MASTER_ID='" + master_id + "' where FINE_ID='" + fineId + "' AND SessionID='" + SYSTEMSETTING.sessionid + "' and branch_id='" + SYSTEMSETTING.branch_ID + "'";
+                                myListofQueries.Add(QUERY);
+                            }
+                        }
+                    }
+
+                    // Insert unique FEE_DETAIL records (preventing duplicate lines)
+                    foreach (KeyValuePair<string, double> kvp in feeDetailsMap)
+                    {
+                        string headId = kvp.Key;
+                        double detailAmt = kvp.Value;
+
+                        QUERY = "Insert into FEE_DETAIL(FEE_MASTER_ID,Fee_head_id,AMOUNT,FEE_MONTH,ISCURRENT,BALANCE,FEE_MONTH_FROM,SessionID,branch_id) VALUES(" + master_id + "," + headId + "," + detailAmt + ",'" + month + "','Y','" + detailAmt + "','" + monthfrom + "','" + SYSTEMSETTING.sessionid + "','" + SYSTEMSETTING.branch_ID + "')";
+                        myListofQueries.Add(QUERY);
+
+                        tamount = tamount + detailAmt;
+                    }
+
+
+                    //---- Previous Balance (Read-Only Arrears Carry Forward) ---------
+                    double tprvbal = GetPreviousOutstandingArrears(RowDocument["s_id"].ToString(), month, master_id, SYSTEMSETTING.branch_ID, SYSTEMSETTING.sessionid);
+                    if (tprvbal > 0)
+                    {
+                        string prvba = GetBranchArrearHeadId(SYSTEMSETTING.branch_ID);
+                        QUERY = "Insert into FEE_DETAIL(FEE_MASTER_ID,Fee_head_id,AMOUNT,FEE_MONTH,ISCURRENT,BALANCE,FEE_MONTH_FROM,SessionID,branch_id) VALUES(" + master_id + ",'" + prvba + "'," + tprvbal + ",'" + month + "','N','" + tprvbal + "','" + monthfrom + "','" + SYSTEMSETTING.sessionid + "','" + SYSTEMSETTING.branch_ID + "')";
+                        myListofQueries.Add(QUERY);
+                        tamount = tamount + tprvbal;
+                    }
+
+
+                    //Update fine status and fee month
+                    //QUERY = "Update FINE Set STATUS='R', FEE_MONTH='" & ddlmonth.SelectedItem.ToString() & "' WHERE SCHOOL_ID='" & Session("SCHOOL_ID") & "' AND BRANCH_ID='" & Session("BRANCH_ID") & "' AND CLASS_SEC='" & ddlclass.SelectedValue & "' and STUDENT_ID='" & Row_std(0) & "' ";
+                    //myListofQueries.Add(QUERY);
+
+                    QUERY = "Update FEE_MASTER Set RECEIVABLE_AMOUNT='" + tamount + "', BALANCE='" + tamount + "' WHERE FEE_MASTER_ID='" + master_id + "' AND SESSIONID='" + SYSTEMSETTING.sessionid + "' and branch_id='" + SYSTEMSETTING.branch_ID + "'";
+                    myListofQueries.Add(QUERY);
+
+
+                    master_id = (Convert.ToInt64(master_id) + 1).ToString();
+                }
+
+
+                if (myListofQueries.Count > 0)
+                {
+                    string[] bulkqueries1 = myListofQueries.ToArray();
+                    CHECK = SYS.Insert_Query_manualcommit(bulkqueries1);
+
+                    if (CHECK == true)
+                    {
+                        //SYS.setMessageBox("Fee Generated Generated", 1);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Fee Not Generated!");
+                    }
+                }
+
+                // Also check and apply any pending fines for students with existing vouchers
+                ApplyPendingFinesForClassOrStudents(classid, month, monthfrom, SHIFT, sectionID, studentid);
+
+            }
+            catch (Exception exp)
+            {
+                SYS.setMessageBox(exp.Message, 3);
+            }
+
+
+
+        }
+
+        /// <summary>
+        /// Applies all active, unapplied pending fines and concessions to an existing student fee voucher.
+        /// Inserts line items into FEE_DETAIL, updates FINE_HISTORY to active='N' and links FEE_MASTER_ID,
+        /// and recalculates FEE_MASTER.RECEIVABLE_AMOUNT and BALANCE in a single transaction.
+        /// </summary>
+        public int ApplyPendingFinesToExistingVoucher(string masterId, string studentId, string admissionNo, string monthTo, string monthFrom)
+        {
+            if (string.IsNullOrEmpty(masterId) || string.IsNullOrEmpty(studentId))
+                return 0;
+
+            int appliedCount = 0;
+            try
+            {
+                string mTo = (monthTo ?? "").Trim();
+                string mFrom = (monthFrom ?? "").Trim();
+                if (string.IsNullOrEmpty(mFrom)) mFrom = mTo;
+
+                string adm = (admissionNo ?? "").Trim().Replace("'", "''");
+                string sid = studentId.Trim().Replace("'", "''");
+
+                string q = "SELECT b.FINE_ID, b.Fee_head_id, b.FINE_AMOUNT, a.Category, a.Fee_head " +
+                           "FROM FINE_HISTORY b " +
+                           "INNER JOIN Fee_Head a ON b.Fee_head_id = a.Fee_head_id " +
+                           "WHERE (b.S_ID = '" + sid + "'" + (!string.IsNullOrEmpty(adm) ? " OR b.S_ID = '" + adm + "'" : "") + ") " +
+                           "  AND (b.active = 'Y' OR b.active LIKE 'Y%') " +
+                           "  AND (b.FEE_MASTER_ID IS NULL OR b.FEE_MASTER_ID = '') " +
+                           "  AND b.SessionID = '" + SYSTEMSETTING.sessionid + "' " +
+                           "  AND b.branch_id = '" + SYSTEMSETTING.branch_ID + "' " +
+                           "  AND (LTRIM(RTRIM(b.FEE_MONTH)) = '" + mTo + "' " +
+                           "       OR LTRIM(RTRIM(b.FEE_MONTH)) = '" + mFrom + "' " +
+                           "       OR (b.FEE_MONTH >= '" + mFrom + "' AND b.FEE_MONTH <= '" + mTo + "') " +
+                           "       OR b.FEE_MONTH = '' OR b.FEE_MONTH IS NULL)";
+
+                DataSet ds = SYS.Show_Query(q);
+                bool hasFines = (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0);
+
+                // Check if student has saved CONCESSION_FEE that needs to be applied to an existing voucher
+                double stdConcession = 0;
+                string qStudentConc = "SELECT CONCESSION_FEE FROM student WHERE s_id = '" + sid + "' AND branch_id = '" + SYSTEMSETTING.branch_ID + "'";
+                DataSet dsStdConc = SYS.Show_Query(qStudentConc);
+                if (dsStdConc != null && dsStdConc.Tables.Count > 0 && dsStdConc.Tables[0].Rows.Count > 0 && dsStdConc.Tables[0].Rows[0]["CONCESSION_FEE"] != DBNull.Value)
+                {
+                    double.TryParse(dsStdConc.Tables[0].Rows[0]["CONCESSION_FEE"].ToString(), out stdConcession);
+                }
+
+                if (!hasFines && stdConcession <= 0)
+                {
+                    return 0;
+                }
+
+                List<string> updateQueries = new List<string>();
+
+                // Query existing FEE_DETAIL lines for this voucher to prevent duplicate lines
+                string qDetails = "SELECT FEE_DETAIL_ID, Fee_head_id, AMOUNT FROM FEE_DETAIL " +
+                                  "WHERE FEE_MASTER_ID = '" + masterId + "' " +
+                                  "  AND SessionID = '" + SYSTEMSETTING.sessionid + "' " +
+                                  "  AND branch_id = '" + SYSTEMSETTING.branch_ID + "' ORDER BY FEE_DETAIL_ID";
+                DataSet dsDetails = SYS.Show_Query(qDetails);
+                Dictionary<string, List<string[]>> existingDetails = new Dictionary<string, List<string[]>>();
+                if (dsDetails != null && dsDetails.Tables.Count > 0)
+                {
+                    foreach (DataRow dr in dsDetails.Tables[0].Rows)
+                    {
+                        string hId = dr["Fee_head_id"].ToString().Trim();
+                        string dId = dr["FEE_DETAIL_ID"].ToString().Trim();
+                        string dAmt = (dr["AMOUNT"] != DBNull.Value) ? dr["AMOUNT"].ToString().Trim() : "0";
+                        if (!existingDetails.ContainsKey(hId))
+                        {
+                            existingDetails[hId] = new List<string[]>();
+                        }
+                        existingDetails[hId].Add(new string[] { dId, dAmt });
+                    }
+                }
+
+                // If student has a saved concession fee in student profile and voucher currently has 0 concession, apply it
+                if (stdConcession > 0)
+                {
+                    // Find concession fee head for this branch
+                    string qConcHead = "SELECT TOP 1 Fee_head_id FROM Fee_Head WHERE branch_id = '" + SYSTEMSETTING.branch_ID + "' AND (Category IN ('DISCOUNT', 'CONCESSION') OR UPPER(Fee_head) LIKE '%CONCESSION%') ORDER BY CASE WHEN UPPER(LTRIM(RTRIM(Fee_head))) = 'FEE CONCESSION' THEN 1 WHEN UPPER(LTRIM(RTRIM(Fee_head))) LIKE '%CONCESSION%' THEN 2 ELSE 3 END, Fee_head_id";
+                    DataSet dsConcHead = SYS.Show_Query(qConcHead);
+                    if (dsConcHead != null && dsConcHead.Tables.Count > 0 && dsConcHead.Tables[0].Rows.Count > 0)
+                    {
+                        string concHeadId = dsConcHead.Tables[0].Rows[0]["Fee_head_id"].ToString().Trim();
+                        double tMonths = 1;
+                        string qMonths = "SELECT ISNULL(T_MONTHS, 1) FROM FEE_MASTER WHERE FEE_MASTER_ID = '" + masterId + "' AND SessionID = '" + SYSTEMSETTING.sessionid + "' AND branch_id = '" + SYSTEMSETTING.branch_ID + "'";
+                        DataSet dsM = SYS.Show_Query(qMonths);
+                        if (dsM != null && dsM.Tables.Count > 0 && dsM.Tables[0].Rows.Count > 0 && dsM.Tables[0].Rows[0][0] != DBNull.Value)
+                        {
+                            double.TryParse(dsM.Tables[0].Rows[0][0].ToString(), out tMonths);
+                        }
+                        if (tMonths <= 0) tMonths = 1;
+
+                        double concAmt = stdConcession * tMonths;
+
+                        if (existingDetails.ContainsKey(concHeadId) && existingDetails[concHeadId].Count > 0)
+                        {
+                            double currentConcAmt = 0;
+                            double.TryParse(existingDetails[concHeadId][0][1], out currentConcAmt);
+                            // Only apply if the existing concession line is 0 (i.e. unapplied)
+                            if (currentConcAmt >= 0)
+                            {
+                                string primaryDetailId = existingDetails[concHeadId][0][0];
+                                double newConcAmt = -concAmt;
+                                string updConc = "UPDATE FEE_DETAIL SET AMOUNT = " + newConcAmt + ", BALANCE = " + newConcAmt + " " +
+                                                 "WHERE FEE_DETAIL_ID = '" + primaryDetailId + "' " +
+                                                 "  AND SessionID = '" + SYSTEMSETTING.sessionid + "' " +
+                                                 "  AND branch_id = '" + SYSTEMSETTING.branch_ID + "'";
+                                updateQueries.Add(updConc);
+                                existingDetails[concHeadId][0][1] = newConcAmt.ToString();
+                                appliedCount++;
+                            }
+                        }
+                        else
+                        {
+                            // Concession line not yet in voucher, insert it
+                            double newConcAmt = -concAmt;
+                            string insConc = "INSERT INTO FEE_DETAIL (FEE_MASTER_ID, Fee_head_id, AMOUNT, FEE_MONTH, ISCURRENT, BALANCE, FEE_MONTH_FROM, SessionID, branch_id) " +
+                                             "VALUES (" + masterId + ", " + concHeadId + ", " + newConcAmt + ", '" + mTo + "', 'Y', " + newConcAmt + ", '" + mFrom + "', '" + SYSTEMSETTING.sessionid + "', '" + SYSTEMSETTING.branch_ID + "')";
+                            updateQueries.Add(insConc);
+                            existingDetails[concHeadId] = new List<string[]>();
+                            existingDetails[concHeadId].Add(new string[] { "NEW", newConcAmt.ToString() });
+                            appliedCount++;
+                        }
+                    }
+                }
+
+                if (hasFines)
+                {
+                    foreach (DataRow row in ds.Tables[0].Rows)
+                    {
+                        string fineId = row["FINE_ID"].ToString().Trim();
+                        string feeHeadId = row["Fee_head_id"].ToString().Trim();
+                        string category = row["Category"] != DBNull.Value ? row["Category"].ToString().Trim().ToUpper() : "";
+                        double fineAmt = 0;
+                        if (row["FINE_AMOUNT"] != DBNull.Value)
+                        {
+                            double.TryParse(row["FINE_AMOUNT"].ToString(), out fineAmt);
+                        }
+
+                        if (fineAmt <= 0) continue;
+
+                        bool isConcession = (category == "DISCOUNT" || category == "CONCESSION");
+
+                        if (existingDetails.ContainsKey(feeHeadId) && existingDetails[feeHeadId].Count > 0)
+                        {
+                            // Update the primary row for this fee head
+                            string primaryDetailId = existingDetails[feeHeadId][0][0];
+                            double existingAmt = 0;
+                            double.TryParse(existingDetails[feeHeadId][0][1], out existingAmt);
+                            double newAmt;
+
+                            if (isConcession)
+                            {
+                                if (existingAmt <= 0)
+                                {
+                                    newAmt = -(Math.Abs(existingAmt) + fineAmt);
+                                }
+                                else
+                                {
+                                    newAmt = -fineAmt;
+                                }
+                            }
+                            else
+                            {
+                                newAmt = existingAmt + fineAmt;
+                            }
+
+                            string updDetail = "UPDATE FEE_DETAIL SET AMOUNT = " + newAmt + ", BALANCE = " + newAmt + " " +
+                                               "WHERE FEE_DETAIL_ID = '" + primaryDetailId + "' " +
+                                               "  AND SessionID = '" + SYSTEMSETTING.sessionid + "' " +
+                                               "  AND branch_id = '" + SYSTEMSETTING.branch_ID + "'";
+                            updateQueries.Add(updDetail);
+
+                            // Update in-memory tracker
+                            existingDetails[feeHeadId][0][1] = newAmt.ToString();
+
+                            // Delete any duplicate rows for this fee head in this voucher
+                            for (int i = 1; i < existingDetails[feeHeadId].Count; i++)
+                            {
+                                string dupId = existingDetails[feeHeadId][i][0];
+                                string delDup = "DELETE FROM FEE_DETAIL WHERE FEE_DETAIL_ID = '" + dupId + "' " +
+                                                "  AND SessionID = '" + SYSTEMSETTING.sessionid + "' " +
+                                                "  AND branch_id = '" + SYSTEMSETTING.branch_ID + "'";
+                                updateQueries.Add(delDup);
+                            }
+                            if (existingDetails[feeHeadId].Count > 1)
+                            {
+                                existingDetails[feeHeadId].RemoveRange(1, existingDetails[feeHeadId].Count - 1);
+                            }
+                        }
+                        else
+                        {
+                            // Fee head not yet in voucher; insert single line
+                            double detailAmt = isConcession ? -fineAmt : fineAmt;
+                            string insDetail = "INSERT INTO FEE_DETAIL (FEE_MASTER_ID, Fee_head_id, AMOUNT, FEE_MONTH, ISCURRENT, BALANCE, FEE_MONTH_FROM, SessionID, branch_id) " +
+                                               "VALUES (" + masterId + ", " + feeHeadId + ", " + detailAmt + ", '" + mTo + "', 'Y', " + detailAmt + ", '" + mFrom + "', '" + SYSTEMSETTING.sessionid + "', '" + SYSTEMSETTING.branch_ID + "')";
+                            updateQueries.Add(insDetail);
+
+                            if (!existingDetails.ContainsKey(feeHeadId))
+                            {
+                                existingDetails[feeHeadId] = new List<string[]>();
+                            }
+                            existingDetails[feeHeadId].Add(new string[] { "NEW", detailAmt.ToString() });
+                        }
+
+                        // Mark FINE_HISTORY as applied
+                        string updFine = "UPDATE FINE_HISTORY SET active = 'N', FEE_MASTER_ID = '" + masterId + "' " +
+                                         "WHERE FINE_ID = '" + fineId + "' AND SessionID = '" + SYSTEMSETTING.sessionid + "' AND branch_id = '" + SYSTEMSETTING.branch_ID + "'";
+                        updateQueries.Add(updFine);
+
+                        appliedCount++;
+                    }
+                }
+
+                if (updateQueries.Count > 0)
+                {
+                    string updMaster = "UPDATE FEE_MASTER SET " +
+                                       "RECEIVABLE_AMOUNT = (SELECT ISNULL(SUM(AMOUNT), 0) FROM FEE_DETAIL WHERE FEE_MASTER_ID = '" + masterId + "' AND SessionID = '" + SYSTEMSETTING.sessionid + "' AND branch_id = '" + SYSTEMSETTING.branch_ID + "'), " +
+                                       "BALANCE = (SELECT ISNULL(SUM(AMOUNT), 0) FROM FEE_DETAIL WHERE FEE_MASTER_ID = '" + masterId + "' AND SessionID = '" + SYSTEMSETTING.sessionid + "' AND branch_id = '" + SYSTEMSETTING.branch_ID + "') - ISNULL(REC_AMOUNT, 0) " +
+                                       "WHERE FEE_MASTER_ID = '" + masterId + "' AND SessionID = '" + SYSTEMSETTING.sessionid + "' AND branch_id = '" + SYSTEMSETTING.branch_ID + "'";
+                    updateQueries.Add(updMaster);
+
+                    bool ok = SYS.Insert_Query_manualcommit(updateQueries.ToArray());
+                    if (!ok)
+                    {
+                        appliedCount = 0;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                appliedCount = 0;
+            }
+
+            return appliedCount;
+        }
+
+        /// <summary>
+        /// Scans for students in a class (or a specific student) who already have a voucher for this month
+        /// and applies any pending fines or concessions to their existing vouchers.
+        /// </summary>
+        public int ApplyPendingFinesForClassOrStudents(string classId, string monthTo, string monthFrom, string shift, string sectionId, string studentId)
+        {
+            int totalApplied = 0;
+            try
+            {
+                string mTo = (monthTo ?? "").Trim();
+                string mFrom = (monthFrom ?? "").Trim();
+                if (string.IsNullOrEmpty(mFrom)) mFrom = mTo;
+
+                string q = "SELECT fm.FEE_MASTER_ID, fm.s_id, s.ADMISSION_NO " +
+                           "FROM FEE_MASTER fm " +
+                           "INNER JOIN student s ON fm.s_id = s.s_id AND s.branch_id = fm.branch_id " +
+                           "WHERE fm.C_ID = '" + classId + "' " +
+                           "  AND fm.SessionID = '" + SYSTEMSETTING.sessionid + "' " +
+                           "  AND fm.branch_id = '" + SYSTEMSETTING.branch_ID + "' " +
+                           "  AND (fm.FEE_MONTH = '" + mTo + "' OR fm.FEE_MONTH = '" + mFrom + "' OR fm.FEE_MONTH_FROM = '" + mTo + "' OR fm.FEE_MONTH_FROM = '" + mFrom + "') ";
+
+                if (!string.IsNullOrEmpty(studentId))
+                {
+                    q += " AND fm.s_id = '" + studentId.Replace("'", "''") + "' ";
+                }
+                if (!string.IsNullOrEmpty(shift))
+                {
+                    q += " AND fm.SHIFT = '" + shift.Replace("'", "''") + "' ";
+                }
+
+                DataSet ds = SYS.Show_Query(q);
+                if (ds != null && ds.Tables.Count > 0)
+                {
+                    foreach (DataRow r in ds.Tables[0].Rows)
+                    {
+                        string mId = r["FEE_MASTER_ID"].ToString();
+                        string sId = r["s_id"].ToString();
+                        string adm = r["ADMISSION_NO"] != DBNull.Value ? r["ADMISSION_NO"].ToString() : "";
+
+                        totalApplied += ApplyPendingFinesToExistingVoucher(mId, sId, adm, mTo, mFrom);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+            return totalApplied;
+        }
+
+        public bool submitfeeSingle(double paidamountbyform, string voucherno, bool finetag, DateTime submitdate, DateTime Duedate, string bankid, string SCROLLNO)
+        {
+            bool a = false;
+            double receivable_amount = 0;
+            double balance = 0;
+            double headamount = 0;
+            double paidamount = 0;
+            double remainingamount = 0;
+            string feemonth = "";
+            string sid = "";
+            string classid = "";
+            string multitag = "";
+            string fineafterduedate = "";
+            string fee_month_from = "";
+
+            try
+            {
+
+                QUERY = "Select * from [FEE_MASTER] where FEE_MASTER_ID='" + voucherno + "' and SessionID='" + SYSTEMSETTING.sessionid + "'";
+                rs = SYS.Show_Query(QUERY);
+                foreach (DataRow Row in rs.Tables[0].Rows)
+                {
+                    receivable_amount = Convert.ToDouble(Row["RECEIVABLE_AMOUNT"].ToString());
+                    feemonth = Row["FEE_MONTH"].ToString();
+                    fee_month_from = Row["FEE_MONTH_FROM"].ToString();
+                    sid = Row["s_id"].ToString();
+                    classid = Row["C_ID"].ToString();
+                    multitag = Row["MULTITAG"].ToString();
+                    fineafterduedate = Row["FINE_AFTER_DUE_DATE"].ToString();
+
+                }
+
+
+                //----- Update student status from un-confirmed to confirm ------//
+                bool isconfirmation = true;
+                QUERY = "UPDATE student set isconfirm='" + isconfirmation + "' where s_id='" + sid + "' and SessionID='" + SYSTEMSETTING.sessionid + "'";
+                SYS.Insert_Query(QUERY);
+                //---- ~~~~~~~~~~~~~~~~~~~ -----//
+
+                if (submitdate > Duedate)
+                {
+                    receivable_amount = Convert.ToDouble(receivable_amount) + Convert.ToDouble(fineafterduedate);
+                }
+                balance = Convert.ToDouble(receivable_amount) - Convert.ToDouble(paidamountbyform);
+
+                QUERY = "Update FEE_MASTER set REC_AMOUNT='" + paidamountbyform + "', SUBMIT_DATE='" + submitdate + "',RECEIVABLE_AMOUNT='" + receivable_amount + "',PAID='Y',BALANCE ='" + balance + "', STATUS='Y',BANK_ID='" + bankid + "',SCROLLNO='" + SCROLLNO + "',FINE_AFTER_DUE_DATE=0 WHERE FEE_MASTER_ID='" + voucherno + "' and SessionID='" + SYSTEMSETTING.sessionid + "' ";
+                a = SYS.Insert_Query(QUERY);
+
+                paidamount = paidamountbyform;
+
+                QUERY = "select AMOUNT ,FEE_DETAIL_ID from FEE_DETAIL where FEE_MASTER_ID='" + voucherno + "' and SessionID='" + SYSTEMSETTING.sessionid + "' order by AMOUNT";
+                rs = SYS.Show_Query(QUERY);
+                if (rs.Tables[0].Rows.Count > 0)
+                {
+
+                    foreach (DataRow Row in rs.Tables[0].Rows)
+                    {
+                        headamount = Convert.ToDouble(Row[0]);
+
+                        if (paidamount > headamount)
+                        {
+                            remainingamount = paidamount - headamount;
+                            paidamount = remainingamount;
+                            SYS.Insert_Query("Update FEE_DETAIL set RECEIVED_AMOUNT='" + headamount + "',BALANCE= AMOUNT - " + headamount + " where FEE_MASTER_ID='" + voucherno + "'  and  FEE_DETAIL_ID='" + Row[1].ToString() + "' and SessionID='" + SYSTEMSETTING.sessionid + "' ");
+
+
+                        }
+                        else if (paidamount <= headamount & paidamount > 0)
+                        {
+                            SYS.Insert_Query("Update FEE_DETAIL set RECEIVED_AMOUNT='" + paidamount + "', BALANCE= AMOUNT - " + paidamount + " where FEE_MASTER_ID='" + voucherno + "' and  FEE_DETAIL_ID='" + Row[1].ToString() + "' and SessionID='" + SYSTEMSETTING.sessionid + "' ");
+                            paidamount = 0;
+
+
+                        }
+                        else if (paidamount == 0)
+                        {
+                            SYS.Insert_Query("Update FEE_DETAIL set RECEIVED_AMOUNT='" + paidamount + "', BALANCE= AMOUNT - " + paidamount + " where FEE_MASTER_ID='" + voucherno + "' and  FEE_DETAIL_ID='" + Row[1].ToString() + "' and SessionID='" + SYSTEMSETTING.sessionid + "' ");
+
+                        }
+
+                    }
+
+                    finetag = false;
+                    if (finetag == true)
+                    {
+                        DateTime date = Convert.ToDateTime(submitdate);
+                        int day = ((int)date.Day);
+                        double totalfine = 0;
+                        double tdays = 0;
+                        //&& day < 21
+                        if (day > 15)
+                        {
+                            tdays = day - 15;
+                        }
+                        else
+                        {
+
+                        }
+                        totalfine = tdays * 5;
+
+
+                        if (multitag == "Y" && submitdate > Duedate)
+                        {
+                            totalfine = Convert.ToDouble(fineafterduedate);
+                        }
+
+
+                        string newID = "1";
+                        int myID;
+                        rs = SYS.Show_Query("select max(CONVERT(INT, FINE_ID)) as ids from FINE_HISTORY WHERE sessionid='" + SYSTEMSETTING.sessionid + "'");
+                        foreach (DataRow Row in rs.Tables[0].Rows)
+                        {
+                            string strid = Row["ids"].ToString();
+                            if (strid == "")
+                            {
+                                newID = "1";
+                            }
+                            else
+                            {
+                                myID = Convert.ToInt32(Row["ids"]) + 1;
+                                newID = myID.ToString();
+                            }
+                        }
+                        //
+                        string QUERY1 = "insert into FINE_HISTORY(FINE_ID,S_ID,Fee_head_id,FINE_DATE,FINE_AMOUNT,FEE_MONTH,c_id,active,FEE_MASTER_ID,sessionid,SUBMISSION_DATE_NEW,BRANCH_ID) values ('" + newID.ToString() + "','" + sid + "','6','" + submitdate + "','" + totalfine + "','','" + classid + "','Y','" + voucherno + "','" + SYSTEMSETTING.sessionid + "','" + submitdate + "','" + SYSTEMSETTING.branch_ID + "')";
+                        SYS.Insert_Query(QUERY1);
+                    }
+                }
+
+                string QUERY2 = "Insert into FEE_HISTORY(VOUCHER_NO,SUBMITION_DATE,PAID_AMOUNT,SessionID,SUBMISSION_DATE_NEW,BRANCH_ID)VALUES('" + voucherno + "','" + Convert.ToDateTime(submitdate).ToShortDateString() + "','" + paidamount + "','" + SYSTEMSETTING.sessionid + "','" + submitdate + "','" + SYSTEMSETTING.branch_ID + "')";
+                SYS.Insert_Query(QUERY2);
+
+                //string fee_head_id = "";
+                //if (submitdate > Duedate)
+                //{
+
+                //    rs = SYS.Show_Query("select Fee_head_id from Fee_Head where Category='LATE FEE FINE' AND branch_id='" + SYSTEMSETTING.branch_ID + "'");
+                //    foreach (DataRow Row in rs.Tables[0].Rows)
+                //    {
+                //        fee_head_id = Row[0].ToString();
+                //    }
+                //    //RECEIVED_AMOUNT,BALANCE
+                //    QUERY = "Insert into FEE_DETAIL(FEE_MASTER_ID,Fee_head_id,AMOUNT,FEE_MONTH,ISCURRENT,BALANCE,FEE_MONTH_FROM,SessionID,branch_id,RECEIVED_AMOUNT) VALUES(" + voucherno + "," + fee_head_id + "," + fineafterduedate + ",'" + feemonth + "','Y','0','" + fee_month_from + "','" + SYSTEMSETTING.sessionid + "','" + SYSTEMSETTING.branch_ID + "','" + fineafterduedate + "')";
+                //    SYS.Insert_Query(QUERY);
+                //}
+
+
+
+                //if (a == true)
+                //{
+                //   SYS.setMessageBox("Fee Received Succesfully!", 1);
+                //}
+
+            }
+            catch (Exception ex)
+            {
+                SYS.setMessageBox(ex.Message, 3);
+                a = false;
+            }
+
+            return a;
+        }
+
+
+        public void BalanceVoucher(string VoucherNo)
+        {
+            string TotalAmount = "";
+
+            rs = SYS.Show_Query("select sum(amount) from FEE_DETAIL where FEE_MASTER_ID='" + VoucherNo + "' AND SessionID='" + SYSTEMSETTING.sessionid + "'");
+
+            foreach (DataRow RowDocument in rs.Tables[0].Rows)
+            {
+                TotalAmount = RowDocument[0].ToString();
+            }
+
+            SYS.Insert_Query("Update FEE_MASTER set RECEIVABLE_AMOUNT='" + TotalAmount + "',BALANCE='" + TotalAmount + "' where FEE_MASTER_ID='" + VoucherNo + "' AND SessionID='" + SYSTEMSETTING.sessionid + "'");
+        }
+
+        public static int GetFeeMonthSortKey(string feeMonth)
+        {
+            if (string.IsNullOrEmpty(feeMonth)) return 0;
+            string s = feeMonth.Trim();
+
+            string[] parts = s.Split(new char[] { ' ', '/', '-', '.' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 2)
+            {
+                int p0, p1;
+                if (int.TryParse(parts[0], out p0) && int.TryParse(parts[1], out p1))
+                {
+                    if (p1 > 1000 && p0 >= 1 && p0 <= 12)
+                    {
+                        return p1 * 12 + p0;
+                    }
+                    if (p0 > 1000 && p1 >= 1 && p1 <= 12)
+                    {
+                        return p0 * 12 + p1;
+                    }
+                }
+            }
+
+            DateTime dt;
+            if (DateTime.TryParse(s, out dt))
+            {
+                return dt.Year * 12 + dt.Month;
+            }
+
+            return 0;
+        }
+
+        public string GetBranchArrearHeadId(string branchId)
+        {
+            try
+            {
+                string q = "SELECT TOP 1 Fee_head_id FROM Fee_Head WHERE branch_id = '" + branchId + "' AND (Category = 'ARREAR' OR UPPER(Fee_head) LIKE '%ARREAR%') ORDER BY CASE WHEN Category = 'ARREAR' THEN 1 ELSE 2 END, CASE WHEN UPPER(LTRIM(RTRIM(Fee_head))) = 'ARREARS' THEN 1 WHEN UPPER(LTRIM(RTRIM(Fee_head))) = 'PREVIOUS ARREARS' THEN 2 ELSE 3 END, Fee_head_id";
+                DataSet ds = SYS.Show_Query(q);
+                if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                {
+                    return ds.Tables[0].Rows[0]["Fee_head_id"].ToString();
+                }
+            }
+            catch { }
+            return "3";
+        }
+
+        public double GetPreviousOutstandingArrears(string studentId, string currentFeeMonth, string currentMasterId, string branchId, string sessionId)
+        {
+            try
+            {
+                int targetKey = GetFeeMonthSortKey(currentFeeMonth);
+
+                string q = "SELECT FEE_MASTER_ID, FEE_MONTH, RECEIVABLE_AMOUNT, REC_AMOUNT, BALANCE, PAID FROM FEE_MASTER WHERE s_id = '" + studentId + "' AND branch_id = '" + branchId + "' AND SessionID = '" + sessionId + "'";
+                if (!string.IsNullOrEmpty(currentMasterId))
+                {
+                    q += " AND FEE_MASTER_ID <> '" + currentMasterId + "'";
+                }
+                q += " ORDER BY FEE_MASTER_ID";
+
+                DataSet ds = SYS.Show_Query(q);
+                if (ds == null || ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+                {
+                    return 0;
+                }
+
+                List<DataRow> priorVouchers = new List<DataRow>();
+                foreach (DataRow row in ds.Tables[0].Rows)
+                {
+                    string vMonth = row["FEE_MONTH"] != DBNull.Value ? row["FEE_MONTH"].ToString().Trim() : "";
+                    int vKey = GetFeeMonthSortKey(vMonth);
+
+                    if (targetKey > 0 && vKey > 0)
+                    {
+                        if (vKey < targetKey)
+                        {
+                            priorVouchers.Add(row);
+                        }
+                    }
+                    else
+                    {
+                        if (!string.Equals(vMonth, currentFeeMonth, StringComparison.OrdinalIgnoreCase))
+                        {
+                            priorVouchers.Add(row);
+                        }
+                    }
+                }
+
+                if (priorVouchers.Count == 0)
+                {
+                    return 0;
+                }
+
+                priorVouchers.Sort(delegate(DataRow a, DataRow b)
+                {
+                    int ka = GetFeeMonthSortKey(a["FEE_MONTH"].ToString());
+                    int kb = GetFeeMonthSortKey(b["FEE_MONTH"].ToString());
+                    if (ka != kb) return ka.CompareTo(kb);
+                    int idA = 0, idB = 0;
+                    int.TryParse(a["FEE_MASTER_ID"].ToString(), out idA);
+                    int.TryParse(b["FEE_MASTER_ID"].ToString(), out idB);
+                    return idA.CompareTo(idB);
+                });
+
+                double totalPriorDebt = 0;
+                double totalPriorPayments = 0;
+
+                for (int i = 0; i < priorVouchers.Count; i++)
+                {
+                    DataRow v = priorVouchers[i];
+                    string vMasterId = v["FEE_MASTER_ID"].ToString();
+
+                    double recAmt = 0;
+                    if (v["REC_AMOUNT"] != DBNull.Value && !string.IsNullOrEmpty(v["REC_AMOUNT"].ToString()))
+                    {
+                        double.TryParse(v["REC_AMOUNT"].ToString(), out recAmt);
+                    }
+                    else if (v["PAID"] != DBNull.Value && v["PAID"].ToString().Trim().ToUpper() == "Y")
+                    {
+                        double bal = 0, recv = 0;
+                        double.TryParse(v["BALANCE"].ToString(), out bal);
+                        double.TryParse(v["RECEIVABLE_AMOUNT"].ToString(), out recv);
+                        if (bal <= 0 && recv > 0)
+                        {
+                            recAmt = recv;
+                        }
+                    }
+                    totalPriorPayments += recAmt;
+
+                    if (i == 0)
+                    {
+                        double recv = 0;
+                        if (v["RECEIVABLE_AMOUNT"] != DBNull.Value)
+                        {
+                            double.TryParse(v["RECEIVABLE_AMOUNT"].ToString(), out recv);
+                        }
+                        if (recv == 0)
+                        {
+                            string qDet0 = "SELECT AMOUNT FROM FEE_DETAIL WHERE FEE_MASTER_ID = '" + vMasterId + "'";
+                            DataSet dsDet0 = SYS.Show_Query(qDet0);
+                            if (dsDet0 != null && dsDet0.Tables.Count > 0)
+                            {
+                                foreach (DataRow rDet0 in dsDet0.Tables[0].Rows)
+                                {
+                                    double damt0 = 0;
+                                    if (rDet0["AMOUNT"] != DBNull.Value)
+                                    {
+                                        double.TryParse(rDet0["AMOUNT"].ToString(), out damt0);
+                                    }
+                                    recv += damt0;
+                                }
+                            }
+                        }
+                        totalPriorDebt += recv;
+                    }
+                    else
+                    {
+                        string qDetail = "SELECT d.AMOUNT FROM FEE_DETAIL d LEFT JOIN Fee_Head h ON d.Fee_head_id = h.Fee_head_id WHERE d.FEE_MASTER_ID = '" + vMasterId + "' AND (h.Category IS NULL OR (h.Category <> 'ARREAR' AND UPPER(h.Fee_head) NOT LIKE '%ARREAR%')) AND (d.ISCURRENT IS NULL OR d.ISCURRENT = 'Y')";
+                        DataSet dsDet = SYS.Show_Query(qDetail);
+                        if (dsDet != null && dsDet.Tables.Count > 0)
+                        {
+                            foreach (DataRow rDet in dsDet.Tables[0].Rows)
+                            {
+                                double damt = 0;
+                                if (rDet["AMOUNT"] != DBNull.Value)
+                                {
+                                    double.TryParse(rDet["AMOUNT"].ToString(), out damt);
+                                }
+                                totalPriorDebt += damt;
+                            }
+                        }
+                    }
+                }
+
+                double outstanding = totalPriorDebt - totalPriorPayments;
+                return (outstanding > 0) ? outstanding : 0;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+
+
+    }
+}

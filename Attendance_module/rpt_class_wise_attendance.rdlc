@@ -1,0 +1,871 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2008/01/reportdefinition">
+  <DataSources>
+    <DataSource Name="Attendance_ds">
+      <ConnectionProperties>
+        <DataProvider>System.Data.DataSet</DataProvider>
+        <ConnectString>/* Local Connection */</ConnectString>
+      </ConnectionProperties>
+      <rd:DataSourceID>7618334d-bf96-4939-baba-33006f3d2b30</rd:DataSourceID>
+    </DataSource>
+  </DataSources>
+  <DataSets>
+    <DataSet Name="DataSet1">
+      <Fields>
+        <Field Name="SessionName">
+          <DataField>SessionName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="SHIFT_ID">
+          <DataField>SHIFT_ID</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="c_name">
+          <DataField>c_name</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="SECTION_ID">
+          <DataField>SECTION_ID</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ADM_NO">
+          <DataField>ADM_NO</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="STUDENT_NAME">
+          <DataField>STUDENT_NAME</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="FATHER_NAME">
+          <DataField>FATHER_NAME</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="FEE_MONTH">
+          <DataField>FEE_MONTH</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ATTEND_DATE">
+          <DataField>ATTEND_DATE</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="ATTEND">
+          <DataField>ATTEND</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ROLL_NO">
+          <DataField>ROLL_NO</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="MARKS_PERCENT">
+          <DataField>MARKS_PERCENT</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>Attendance_ds</DataSourceName>
+        <CommandText>/* Local Query */</CommandText>
+      </Query>
+      <rd:DataSetInfo>
+        <rd:DataSetName>Attendance_ds</rd:DataSetName>
+        <rd:SchemaPath>E:\TSI\Projects\School Management System\Sultana Foundation\Sultana Foundation\Attendance_ds.xsd</rd:SchemaPath>
+        <rd:TableName>Class_wise_attendance</rd:TableName>
+        <rd:TableAdapterFillMethod>Fill</rd:TableAdapterFillMethod>
+        <rd:TableAdapterGetDataMethod>GetData</rd:TableAdapterGetDataMethod>
+        <rd:TableAdapterName>Class_wise_attendanceTableAdapter</rd:TableAdapterName>
+      </rd:DataSetInfo>
+    </DataSet>
+  </DataSets>
+  <Body>
+    <ReportItems>
+      <Tablix Name="Tablix1">
+        <TablixCorner>
+          <TablixCornerRows>
+            <TablixCornerRow>
+              <TablixCornerCell>
+                <CellContents>
+                  <Textbox Name="Textbox4">
+                    <CanGrow>true</CanGrow>
+                    <KeepTogether>true</KeepTogether>
+                    <Paragraphs>
+                      <Paragraph>
+                        <TextRuns>
+                          <TextRun>
+                            <Value>Sr #</Value>
+                            <Style>
+                              <FontFamily>Calibri</FontFamily>
+                              <FontSize>9pt</FontSize>
+                              <FontWeight>Bold</FontWeight>
+                            </Style>
+                          </TextRun>
+                        </TextRuns>
+                        <Style>
+                          <TextAlign>Center</TextAlign>
+                        </Style>
+                      </Paragraph>
+                    </Paragraphs>
+                    <rd:DefaultName>Textbox4</rd:DefaultName>
+                    <Style>
+                      <Border>
+                        <Style>Solid</Style>
+                      </Border>
+                      <BackgroundColor>LightGrey</BackgroundColor>
+                      <PaddingLeft>2pt</PaddingLeft>
+                      <PaddingRight>2pt</PaddingRight>
+                      <PaddingTop>2pt</PaddingTop>
+                      <PaddingBottom>2pt</PaddingBottom>
+                    </Style>
+                  </Textbox>
+                </CellContents>
+              </TablixCornerCell>
+              <TablixCornerCell>
+                <CellContents>
+                  <Textbox Name="Textbox5">
+                    <CanGrow>true</CanGrow>
+                    <KeepTogether>true</KeepTogether>
+                    <Paragraphs>
+                      <Paragraph>
+                        <TextRuns>
+                          <TextRun>
+                            <Value>Student Name</Value>
+                            <Style>
+                              <FontFamily>Calibri</FontFamily>
+                              <FontSize>9pt</FontSize>
+                              <FontWeight>Bold</FontWeight>
+                            </Style>
+                          </TextRun>
+                        </TextRuns>
+                        <Style />
+                      </Paragraph>
+                    </Paragraphs>
+                    <rd:DefaultName>Textbox5</rd:DefaultName>
+                    <Style>
+                      <Border>
+                        <Style>Solid</Style>
+                      </Border>
+                      <BackgroundColor>LightGrey</BackgroundColor>
+                      <PaddingLeft>2pt</PaddingLeft>
+                      <PaddingRight>2pt</PaddingRight>
+                      <PaddingTop>2pt</PaddingTop>
+                      <PaddingBottom>2pt</PaddingBottom>
+                    </Style>
+                  </Textbox>
+                </CellContents>
+              </TablixCornerCell>
+              <TablixCornerCell>
+                <CellContents>
+                  <Textbox Name="Textbox3">
+                    <CanGrow>true</CanGrow>
+                    <KeepTogether>true</KeepTogether>
+                    <Paragraphs>
+                      <Paragraph>
+                        <TextRuns>
+                          <TextRun>
+                            <Value>Father 's Name</Value>
+                            <Style>
+                              <FontFamily>Calibri</FontFamily>
+                              <FontSize>9pt</FontSize>
+                              <FontWeight>Bold</FontWeight>
+                            </Style>
+                          </TextRun>
+                        </TextRuns>
+                        <Style />
+                      </Paragraph>
+                    </Paragraphs>
+                    <rd:DefaultName>Textbox3</rd:DefaultName>
+                    <Style>
+                      <Border>
+                        <Style>Solid</Style>
+                      </Border>
+                      <BackgroundColor>LightGrey</BackgroundColor>
+                      <PaddingLeft>2pt</PaddingLeft>
+                      <PaddingRight>2pt</PaddingRight>
+                      <PaddingTop>2pt</PaddingTop>
+                      <PaddingBottom>2pt</PaddingBottom>
+                    </Style>
+                  </Textbox>
+                </CellContents>
+              </TablixCornerCell>
+              <TablixCornerCell>
+                <CellContents>
+                  <Textbox Name="Textbox11">
+                    <CanGrow>true</CanGrow>
+                    <KeepTogether>true</KeepTogether>
+                    <Paragraphs>
+                      <Paragraph>
+                        <TextRuns>
+                          <TextRun>
+                            <Value>Student Reg</Value>
+                            <Style>
+                              <FontFamily>Calibri</FontFamily>
+                              <FontSize>9pt</FontSize>
+                              <FontWeight>Bold</FontWeight>
+                            </Style>
+                          </TextRun>
+                        </TextRuns>
+                        <Style />
+                      </Paragraph>
+                    </Paragraphs>
+                    <rd:DefaultName>Textbox11</rd:DefaultName>
+                    <Style>
+                      <Border>
+                        <Style>Solid</Style>
+                      </Border>
+                      <BackgroundColor>LightGrey</BackgroundColor>
+                      <PaddingLeft>2pt</PaddingLeft>
+                      <PaddingRight>2pt</PaddingRight>
+                      <PaddingTop>2pt</PaddingTop>
+                      <PaddingBottom>2pt</PaddingBottom>
+                    </Style>
+                  </Textbox>
+                </CellContents>
+              </TablixCornerCell>
+              <TablixCornerCell>
+                <CellContents>
+                  <Textbox Name="Textbox1">
+                    <CanGrow>true</CanGrow>
+                    <KeepTogether>true</KeepTogether>
+                    <Paragraphs>
+                      <Paragraph>
+                        <TextRuns>
+                          <TextRun>
+                            <Value>Marks%</Value>
+                            <Style>
+                              <FontFamily>Calibri</FontFamily>
+                              <FontSize>9pt</FontSize>
+                              <FontWeight>Bold</FontWeight>
+                            </Style>
+                          </TextRun>
+                        </TextRuns>
+                        <Style />
+                      </Paragraph>
+                    </Paragraphs>
+                    <rd:DefaultName>Textbox1</rd:DefaultName>
+                    <Style>
+                      <Border>
+                        <Style>Solid</Style>
+                      </Border>
+                      <BackgroundColor>LightGrey</BackgroundColor>
+                      <PaddingLeft>2pt</PaddingLeft>
+                      <PaddingRight>2pt</PaddingRight>
+                      <PaddingTop>2pt</PaddingTop>
+                      <PaddingBottom>2pt</PaddingBottom>
+                    </Style>
+                  </Textbox>
+                </CellContents>
+              </TablixCornerCell>
+            </TablixCornerRow>
+          </TablixCornerRows>
+        </TablixCorner>
+        <TablixBody>
+          <TablixColumns>
+            <TablixColumn>
+              <Width>0.40625in</Width>
+            </TablixColumn>
+          </TablixColumns>
+          <TablixRows>
+            <TablixRow>
+              <Height>0.25in</Height>
+              <TablixCells>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="ATTEND">
+                      <CanGrow>true</CanGrow>
+                      <KeepTogether>true</KeepTogether>
+                      <Paragraphs>
+                        <Paragraph>
+                          <TextRuns>
+                            <TextRun>
+                              <Value>=Fields!ATTEND.Value</Value>
+                              <Style>
+                                <FontFamily>Calibri</FontFamily>
+                                <FontSize>8pt</FontSize>
+                              </Style>
+                            </TextRun>
+                          </TextRuns>
+                          <Style>
+                            <TextAlign>Center</TextAlign>
+                          </Style>
+                        </Paragraph>
+                      </Paragraphs>
+                      <rd:DefaultName>ATTEND</rd:DefaultName>
+                      <Style>
+                        <Border>
+                          <Style>Solid</Style>
+                        </Border>
+                        <PaddingLeft>2pt</PaddingLeft>
+                        <PaddingRight>2pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+              </TablixCells>
+            </TablixRow>
+          </TablixRows>
+        </TablixBody>
+        <TablixColumnHierarchy>
+          <TablixMembers>
+            <TablixMember>
+              <Group Name="ATTEND_DATE">
+                <GroupExpressions>
+                  <GroupExpression>=Fields!ATTEND_DATE.Value</GroupExpression>
+                </GroupExpressions>
+              </Group>
+              <SortExpressions>
+                <SortExpression>
+                  <Value>=Fields!ATTEND_DATE.Value</Value>
+                </SortExpression>
+              </SortExpressions>
+              <TablixHeader>
+                <Size>0.25in</Size>
+                <CellContents>
+                  <Textbox Name="ATTEND_DATE">
+                    <CanGrow>true</CanGrow>
+                    <KeepTogether>true</KeepTogether>
+                    <Paragraphs>
+                      <Paragraph>
+                        <TextRuns>
+                          <TextRun>
+                            <Value>=Fields!ATTEND_DATE.Value</Value>
+                            <Style>
+                              <FontFamily>Calibri</FontFamily>
+                              <FontSize>9pt</FontSize>
+                              <FontWeight>Bold</FontWeight>
+                              <Format>dd</Format>
+                            </Style>
+                          </TextRun>
+                        </TextRuns>
+                        <Style>
+                          <TextAlign>Center</TextAlign>
+                        </Style>
+                      </Paragraph>
+                    </Paragraphs>
+                    <rd:DefaultName>ATTEND_DATE</rd:DefaultName>
+                    <Style>
+                      <Border>
+                        <Style>Solid</Style>
+                      </Border>
+                      <BackgroundColor>LightGrey</BackgroundColor>
+                      <PaddingLeft>2pt</PaddingLeft>
+                      <PaddingRight>2pt</PaddingRight>
+                      <PaddingTop>2pt</PaddingTop>
+                      <PaddingBottom>2pt</PaddingBottom>
+                    </Style>
+                  </Textbox>
+                </CellContents>
+              </TablixHeader>
+              <TablixMembers>
+                <TablixMember />
+              </TablixMembers>
+            </TablixMember>
+          </TablixMembers>
+        </TablixColumnHierarchy>
+        <TablixRowHierarchy>
+          <TablixMembers>
+            <TablixMember>
+              <Group Name="ADM_NO">
+                <GroupExpressions>
+                  <GroupExpression>=Fields!ROLL_NO.Value</GroupExpression>
+                </GroupExpressions>
+              </Group>
+              <SortExpressions>
+                <SortExpression>
+                  <Value>=Fields!ADM_NO.Value</Value>
+                </SortExpression>
+              </SortExpressions>
+              <TablixMembers>
+                <TablixMember>
+                  <TablixHeader>
+                    <Size>0.40833in</Size>
+                    <CellContents>
+                      <Textbox Name="Textbox6">
+                        <CanGrow>true</CanGrow>
+                        <KeepTogether>true</KeepTogether>
+                        <Paragraphs>
+                          <Paragraph>
+                            <TextRuns>
+                              <TextRun>
+                                <Value>=Code.MatrixRow(RowNumber(Nothing),("ROLL_NO"))</Value>
+                                <Style>
+                                  <FontFamily>Calibri</FontFamily>
+                                  <FontSize>8pt</FontSize>
+                                </Style>
+                              </TextRun>
+                            </TextRuns>
+                            <Style>
+                              <TextAlign>Center</TextAlign>
+                            </Style>
+                          </Paragraph>
+                        </Paragraphs>
+                        <rd:DefaultName>Textbox6</rd:DefaultName>
+                        <Style>
+                          <Border>
+                            <Style>Solid</Style>
+                          </Border>
+                          <PaddingLeft>2pt</PaddingLeft>
+                          <PaddingRight>2pt</PaddingRight>
+                          <PaddingTop>2pt</PaddingTop>
+                          <PaddingBottom>2pt</PaddingBottom>
+                        </Style>
+                      </Textbox>
+                    </CellContents>
+                  </TablixHeader>
+                  <TablixMembers>
+                    <TablixMember>
+                      <Group Name="STUDENT_NAME">
+                        <GroupExpressions>
+                          <GroupExpression>=Fields!STUDENT_NAME.Value</GroupExpression>
+                        </GroupExpressions>
+                      </Group>
+                      <SortExpressions>
+                        <SortExpression>
+                          <Value>=Fields!STUDENT_NAME.Value</Value>
+                        </SortExpression>
+                      </SortExpressions>
+                      <TablixHeader>
+                        <Size>1.30416in</Size>
+                        <CellContents>
+                          <Textbox Name="STUDENT_NAME">
+                            <CanGrow>true</CanGrow>
+                            <KeepTogether>true</KeepTogether>
+                            <Paragraphs>
+                              <Paragraph>
+                                <TextRuns>
+                                  <TextRun>
+                                    <Value>=Fields!STUDENT_NAME.Value</Value>
+                                    <Style>
+                                      <FontFamily>Calibri</FontFamily>
+                                      <FontSize>8pt</FontSize>
+                                    </Style>
+                                  </TextRun>
+                                </TextRuns>
+                                <Style />
+                              </Paragraph>
+                            </Paragraphs>
+                            <rd:DefaultName>STUDENT_NAME</rd:DefaultName>
+                            <Style>
+                              <Border>
+                                <Style>Solid</Style>
+                              </Border>
+                              <PaddingLeft>2pt</PaddingLeft>
+                              <PaddingRight>2pt</PaddingRight>
+                              <PaddingTop>2pt</PaddingTop>
+                              <PaddingBottom>2pt</PaddingBottom>
+                            </Style>
+                          </Textbox>
+                        </CellContents>
+                      </TablixHeader>
+                      <TablixMembers>
+                        <TablixMember>
+                          <Group Name="FATHER_NAME">
+                            <GroupExpressions>
+                              <GroupExpression>=Fields!FATHER_NAME.Value</GroupExpression>
+                            </GroupExpressions>
+                          </Group>
+                          <SortExpressions>
+                            <SortExpression>
+                              <Value>=Fields!FATHER_NAME.Value</Value>
+                            </SortExpression>
+                          </SortExpressions>
+                          <TablixHeader>
+                            <Size>1.25833in</Size>
+                            <CellContents>
+                              <Textbox Name="FATHER_NAME">
+                                <CanGrow>true</CanGrow>
+                                <KeepTogether>true</KeepTogether>
+                                <Paragraphs>
+                                  <Paragraph>
+                                    <TextRuns>
+                                      <TextRun>
+                                        <Value>=Fields!FATHER_NAME.Value</Value>
+                                        <Style>
+                                          <FontFamily>Calibri</FontFamily>
+                                          <FontSize>8pt</FontSize>
+                                        </Style>
+                                      </TextRun>
+                                    </TextRuns>
+                                    <Style />
+                                  </Paragraph>
+                                </Paragraphs>
+                                <rd:DefaultName>FATHER_NAME</rd:DefaultName>
+                                <Style>
+                                  <Border>
+                                    <Style>Solid</Style>
+                                  </Border>
+                                  <PaddingLeft>2pt</PaddingLeft>
+                                  <PaddingRight>2pt</PaddingRight>
+                                  <PaddingTop>2pt</PaddingTop>
+                                  <PaddingBottom>2pt</PaddingBottom>
+                                </Style>
+                              </Textbox>
+                            </CellContents>
+                          </TablixHeader>
+                          <TablixMembers>
+                            <TablixMember>
+                              <TablixHeader>
+                                <Size>1in</Size>
+                                <CellContents>
+                                  <Textbox Name="ROLL_NO1">
+                                    <CanGrow>true</CanGrow>
+                                    <KeepTogether>true</KeepTogether>
+                                    <Paragraphs>
+                                      <Paragraph>
+                                        <TextRuns>
+                                          <TextRun>
+                                            <Value>=Fields!ROLL_NO.Value</Value>
+                                            <Style>
+                                              <FontFamily>Calibri</FontFamily>
+                                              <FontSize>8pt</FontSize>
+                                            </Style>
+                                          </TextRun>
+                                        </TextRuns>
+                                        <Style />
+                                      </Paragraph>
+                                    </Paragraphs>
+                                    <rd:DefaultName>ROLL_NO1</rd:DefaultName>
+                                    <Style>
+                                      <Border>
+                                        <Style>Solid</Style>
+                                      </Border>
+                                      <PaddingLeft>2pt</PaddingLeft>
+                                      <PaddingRight>2pt</PaddingRight>
+                                      <PaddingTop>2pt</PaddingTop>
+                                      <PaddingBottom>2pt</PaddingBottom>
+                                    </Style>
+                                  </Textbox>
+                                </CellContents>
+                              </TablixHeader>
+                              <TablixMembers>
+                                <TablixMember>
+                                  <TablixHeader>
+                                    <Size>0.475in</Size>
+                                    <CellContents>
+                                      <Textbox Name="MARKS_PERCENT">
+                                        <CanGrow>true</CanGrow>
+                                        <KeepTogether>true</KeepTogether>
+                                        <Paragraphs>
+                                          <Paragraph>
+                                            <TextRuns>
+                                              <TextRun>
+                                                <Value>=Fields!MARKS_PERCENT.Value + " %"</Value>
+                                                <Style>
+                                                  <FontFamily>Calibri</FontFamily>
+                                                  <FontSize>8pt</FontSize>
+                                                  <Format>'$' 0;('$' 0)</Format>
+                                                </Style>
+                                              </TextRun>
+                                            </TextRuns>
+                                            <Style />
+                                          </Paragraph>
+                                        </Paragraphs>
+                                        <rd:DefaultName>MARKS_PERCENT</rd:DefaultName>
+                                        <Style>
+                                          <Border>
+                                            <Style>Solid</Style>
+                                          </Border>
+                                          <PaddingLeft>2pt</PaddingLeft>
+                                          <PaddingRight>2pt</PaddingRight>
+                                          <PaddingTop>2pt</PaddingTop>
+                                          <PaddingBottom>2pt</PaddingBottom>
+                                          <rd:FormatSymbolCulture>en-US</rd:FormatSymbolCulture>
+                                        </Style>
+                                      </Textbox>
+                                    </CellContents>
+                                  </TablixHeader>
+                                  <TablixMembers>
+                                    <TablixMember />
+                                  </TablixMembers>
+                                </TablixMember>
+                              </TablixMembers>
+                            </TablixMember>
+                          </TablixMembers>
+                        </TablixMember>
+                      </TablixMembers>
+                    </TablixMember>
+                  </TablixMembers>
+                </TablixMember>
+              </TablixMembers>
+            </TablixMember>
+          </TablixMembers>
+        </TablixRowHierarchy>
+        <DataSetName>DataSet1</DataSetName>
+        <SortExpressions>
+          <SortExpression>
+            <Value>=Fields!MARKS_PERCENT.Value</Value>
+            <Direction>Descending</Direction>
+          </SortExpression>
+        </SortExpressions>
+        <Top>0.0375in</Top>
+        <Height>0.5in</Height>
+        <Width>4.85207in</Width>
+        <Style>
+          <Border>
+            <Style>None</Style>
+          </Border>
+        </Style>
+      </Tablix>
+    </ReportItems>
+    <Height>0.55833in</Height>
+    <Style />
+  </Body>
+  <ReportParameters>
+    <ReportParameter Name="schoolname">
+      <DataType>String</DataType>
+      <Prompt>ReportParameter1</Prompt>
+    </ReportParameter>
+  </ReportParameters>
+  <Code>Dim private count as integer = 0
+   Dim private iniRow as integer = 0
+   Dim private iniGrp as Object = ""
+   Public function MatrixRow(Byval rowNum as integer,Byval rowGrp as Object) as integer
+
+   if iniGrp = "" then
+      iniGrp = rowGrp 
+   end if
+
+  if rowGrp &lt;&gt; iniGrp then
+      iniRow = 0 
+      count = 0 
+      iniGrp = rowGrp 
+  end if
+
+  if iniRow = 0 then
+      iniRow = rowNum
+  end if
+
+  if rowNum = iniRow then
+     count = 0
+  end if
+
+   count = count + 1
+   Return count
+  End function</Code>
+  <Width>11.13542in</Width>
+  <Page>
+    <PageHeader>
+      <Height>1.15986in</Height>
+      <PrintOnFirstPage>true</PrintOnFirstPage>
+      <PrintOnLastPage>true</PrintOnLastPage>
+      <ReportItems>
+        <Textbox Name="Textbox25">
+          <CanGrow>true</CanGrow>
+          <KeepTogether>true</KeepTogether>
+          <Paragraphs>
+            <Paragraph>
+              <TextRuns>
+                <TextRun>
+                  <Value>Attendance Sheet For The Month of : </Value>
+                  <Style>
+                    <FontFamily>Cambria</FontFamily>
+                    <FontSize>11pt</FontSize>
+                    <FontWeight>Bold</FontWeight>
+                  </Style>
+                </TextRun>
+              </TextRuns>
+              <Style />
+            </Paragraph>
+          </Paragraphs>
+          <rd:DefaultName>Textbox25</rd:DefaultName>
+          <Top>0.31528in</Top>
+          <Left>3.36667in</Left>
+          <Height>0.25in</Height>
+          <Width>2.80625in</Width>
+          <Style>
+            <Border>
+              <Style>None</Style>
+            </Border>
+            <PaddingLeft>2pt</PaddingLeft>
+            <PaddingRight>2pt</PaddingRight>
+            <PaddingTop>2pt</PaddingTop>
+            <PaddingBottom>2pt</PaddingBottom>
+          </Style>
+        </Textbox>
+        <Textbox Name="FATHER_NAME1">
+          <CanGrow>true</CanGrow>
+          <KeepTogether>true</KeepTogether>
+          <Paragraphs>
+            <Paragraph>
+              <TextRuns>
+                <TextRun>
+                  <Value>=First(Fields!FEE_MONTH.Value, "DataSet1")</Value>
+                  <Style>
+                    <FontFamily>Cambria</FontFamily>
+                    <FontSize>11pt</FontSize>
+                    <FontWeight>Bold</FontWeight>
+                  </Style>
+                </TextRun>
+              </TextRuns>
+              <Style />
+            </Paragraph>
+          </Paragraphs>
+          <rd:DefaultName>FATHER_NAME1</rd:DefaultName>
+          <Top>0.31528in</Top>
+          <Left>6.17792in</Left>
+          <Height>0.25in</Height>
+          <Width>1.93333in</Width>
+          <ZIndex>1</ZIndex>
+          <Style>
+            <Border>
+              <Style>None</Style>
+            </Border>
+            <PaddingLeft>2pt</PaddingLeft>
+            <PaddingRight>2pt</PaddingRight>
+            <PaddingTop>2pt</PaddingTop>
+            <PaddingBottom>2pt</PaddingBottom>
+          </Style>
+        </Textbox>
+        <Textbox Name="c_name">
+          <CanGrow>true</CanGrow>
+          <KeepTogether>true</KeepTogether>
+          <Paragraphs>
+            <Paragraph>
+              <TextRuns>
+                <TextRun>
+                  <Value>=First(Fields!c_name.Value, "DataSet1")</Value>
+                  <Style>
+                    <FontFamily>Cambria</FontFamily>
+                  </Style>
+                </TextRun>
+              </TextRuns>
+              <Style>
+                <TextAlign>Right</TextAlign>
+              </Style>
+            </Paragraph>
+          </Paragraphs>
+          <rd:DefaultName>c_name</rd:DefaultName>
+          <Top>0.57917in</Top>
+          <Left>4.24653in</Left>
+          <Height>0.225in</Height>
+          <Width>1.3875in</Width>
+          <ZIndex>2</ZIndex>
+          <Style>
+            <Border>
+              <Style>None</Style>
+            </Border>
+            <PaddingLeft>2pt</PaddingLeft>
+            <PaddingRight>2pt</PaddingRight>
+            <PaddingTop>2pt</PaddingTop>
+            <PaddingBottom>2pt</PaddingBottom>
+          </Style>
+        </Textbox>
+        <Textbox Name="SECTION_ID">
+          <CanGrow>true</CanGrow>
+          <KeepTogether>true</KeepTogether>
+          <Paragraphs>
+            <Paragraph>
+              <TextRuns>
+                <TextRun>
+                  <Value>=First(Fields!SECTION_ID.Value, "DataSet1")</Value>
+                  <Style>
+                    <FontFamily>Cambria</FontFamily>
+                  </Style>
+                </TextRun>
+              </TextRuns>
+              <Style>
+                <TextAlign>Left</TextAlign>
+              </Style>
+            </Paragraph>
+          </Paragraphs>
+          <rd:DefaultName>SECTION_ID</rd:DefaultName>
+          <Top>0.57917in</Top>
+          <Left>5.66181in</Left>
+          <Height>0.225in</Height>
+          <Width>1.59167in</Width>
+          <ZIndex>3</ZIndex>
+          <Style>
+            <Border>
+              <Style>None</Style>
+            </Border>
+            <PaddingLeft>2pt</PaddingLeft>
+            <PaddingRight>2pt</PaddingRight>
+            <PaddingTop>2pt</PaddingTop>
+            <PaddingBottom>2pt</PaddingBottom>
+          </Style>
+        </Textbox>
+        <Textbox Name="Textbox29">
+          <CanGrow>true</CanGrow>
+          <KeepTogether>true</KeepTogether>
+          <Paragraphs>
+            <Paragraph>
+              <TextRuns>
+                <TextRun>
+                  <Value>Class Incharge / Subject :</Value>
+                  <Style>
+                    <FontFamily>Cambria</FontFamily>
+                    <FontWeight>Bold</FontWeight>
+                  </Style>
+                </TextRun>
+              </TextRuns>
+              <Style />
+            </Paragraph>
+          </Paragraphs>
+          <rd:DefaultName>Textbox28</rd:DefaultName>
+          <Top>0.86944in</Top>
+          <Left>0.01875in</Left>
+          <Height>0.225in</Height>
+          <Width>2.34167in</Width>
+          <ZIndex>4</ZIndex>
+          <Style>
+            <Border>
+              <Style>None</Style>
+            </Border>
+            <PaddingLeft>2pt</PaddingLeft>
+            <PaddingRight>2pt</PaddingRight>
+            <PaddingTop>2pt</PaddingTop>
+            <PaddingBottom>2pt</PaddingBottom>
+          </Style>
+        </Textbox>
+        <Textbox Name="schoolname">
+          <CanGrow>true</CanGrow>
+          <KeepTogether>true</KeepTogether>
+          <Paragraphs>
+            <Paragraph>
+              <TextRuns>
+                <TextRun>
+                  <Value>=Parameters!schoolname.Value</Value>
+                  <Style>
+                    <FontFamily>Cambria</FontFamily>
+                    <FontSize>14pt</FontSize>
+                    <FontWeight>Bold</FontWeight>
+                  </Style>
+                </TextRun>
+              </TextRuns>
+              <Style>
+                <TextAlign>Center</TextAlign>
+              </Style>
+            </Paragraph>
+          </Paragraphs>
+          <rd:DefaultName>schoolname</rd:DefaultName>
+          <Top>0.0125in</Top>
+          <Height>0.2625in</Height>
+          <Width>11.13542in</Width>
+          <ZIndex>5</ZIndex>
+          <Style>
+            <Border>
+              <Style>None</Style>
+            </Border>
+            <PaddingLeft>2pt</PaddingLeft>
+            <PaddingRight>2pt</PaddingRight>
+            <PaddingTop>2pt</PaddingTop>
+            <PaddingBottom>2pt</PaddingBottom>
+          </Style>
+        </Textbox>
+      </ReportItems>
+      <Style>
+        <Border>
+          <Style>None</Style>
+        </Border>
+      </Style>
+    </PageHeader>
+    <PageHeight>8.27in</PageHeight>
+    <PageWidth>11.69in</PageWidth>
+    <LeftMargin>0.25in</LeftMargin>
+    <RightMargin>0.25in</RightMargin>
+    <TopMargin>0.25in</TopMargin>
+    <BottomMargin>0.25in</BottomMargin>
+    <Style />
+  </Page>
+  <rd:ReportID>28c3efdb-b69b-4a15-be3d-aab9b34a1af6</rd:ReportID>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+</Report>

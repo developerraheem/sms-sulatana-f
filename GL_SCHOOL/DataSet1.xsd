@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="DataSet1" targetNamespace="http://tempuri.org/DataSet1.xsd" xmlns:mstns="http://tempuri.org/DataSet1.xsd" xmlns="http://tempuri.org/DataSet1.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="Settings" AppSettingsPropertyName="SchoolSQLConnectionString" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="SchoolSQLConnectionString (Settings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.GL_SCHOOL.Properties.Settings.GlobalReference.Default.SchoolSQLConnectionString" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="ChartofaccountTableAdapter" GeneratorDataComponentClassName="ChartofaccountTableAdapter" Name="Chartofaccount" UserDataComponentName="ChartofaccountTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="SchoolSQLConnectionString (Settings)" DbObjectType="Unknown" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT        ACT_MAINGROUP.MAIN_GROUP_CODE, ACT_MAINGROUP.MAIN_GROUP_DESC, ACT_SUBGROUP.SUB_GROUP_CODE, ACT_SUBGROUP.SUB_GROUP_DESC, ACT_MASTER.ACCOUNT_CODE, 
+                         ACT_MASTER.ACCOUNT_DESC
+FROM            ACT_MAINGROUP INNER JOIN
+                         ACT_MASTER ON ACT_MAINGROUP.MAIN_GROUP_CODE = ACT_MASTER.MAIN_GROUP_CODE INNER JOIN
+                         ACT_SUBGROUP ON ACT_MASTER.SUB_GROUP_CODE = ACT_SUBGROUP.SUB_GROUP_CODE</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="MAIN_GROUP_CODE" DataSetColumn="MAIN_GROUP_CODE" />
+              <Mapping SourceColumn="MAIN_GROUP_DESC" DataSetColumn="MAIN_GROUP_DESC" />
+              <Mapping SourceColumn="SUB_GROUP_CODE" DataSetColumn="SUB_GROUP_CODE" />
+              <Mapping SourceColumn="SUB_GROUP_DESC" DataSetColumn="SUB_GROUP_DESC" />
+              <Mapping SourceColumn="ACCOUNT_CODE" DataSetColumn="ACCOUNT_CODE" />
+              <Mapping SourceColumn="ACCOUNT_DESC" DataSetColumn="ACCOUNT_DESC" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="GENERAL_LEDGERTableAdapter" GeneratorDataComponentClassName="GENERAL_LEDGERTableAdapter" Name="GENERAL_LEDGER" UserDataComponentName="GENERAL_LEDGERTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="SchoolSQLConnectionString (Settings)" DbObjectType="Unknown" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT        ACT_VOUCHER_MASTER.VOUCHER_NO, ACT_VOUCHER_MASTER.VCH_DATE, ACT_VOUCHER_MASTER.VCH_TYPE, ACT_MASTER.ACCOUNT_CODE, ACT_MASTER.ACCOUNT_DESC, 
+                         ACT_VOUCHER_DETAIL.PARTICULAR, ACT_VOUCHER_DETAIL.DABIT, ACT_VOUCHER_DETAIL.CREDIT
+FROM            ACT_VOUCHER_MASTER INNER JOIN
+                         ACT_VOUCHER_DETAIL ON ACT_VOUCHER_MASTER.VCH_HEAD_ID = ACT_VOUCHER_DETAIL.VCH_HEAD_ID INNER JOIN
+                         ACT_MASTER ON ACT_VOUCHER_DETAIL.ACCOUNT_CODE = ACT_MASTER.ACCOUNT_CODE</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="VOUCHER_NO" DataSetColumn="VOUCHER_NO" />
+              <Mapping SourceColumn="VCH_DATE" DataSetColumn="VCH_DATE" />
+              <Mapping SourceColumn="VCH_TYPE" DataSetColumn="VCH_TYPE" />
+              <Mapping SourceColumn="ACCOUNT_CODE" DataSetColumn="ACCOUNT_CODE" />
+              <Mapping SourceColumn="ACCOUNT_DESC" DataSetColumn="ACCOUNT_DESC" />
+              <Mapping SourceColumn="PARTICULAR" DataSetColumn="PARTICULAR" />
+              <Mapping SourceColumn="DABIT" DataSetColumn="DABIT" />
+              <Mapping SourceColumn="CREDIT" DataSetColumn="CREDIT" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+        </Tables>
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="DataSet1" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msdata:EnforceConstraints="False" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="DataSet1" msprop:Generator_UserDSName="DataSet1">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="Chartofaccount" msprop:Generator_TableClassName="ChartofaccountDataTable" msprop:Generator_TableVarName="tableChartofaccount" msprop:Generator_TablePropName="Chartofaccount" msprop:Generator_RowDeletingName="ChartofaccountRowDeleting" msprop:Generator_RowChangingName="ChartofaccountRowChanging" msprop:Generator_RowEvHandlerName="ChartofaccountRowChangeEventHandler" msprop:Generator_RowDeletedName="ChartofaccountRowDeleted" msprop:Generator_UserTableName="Chartofaccount" msprop:Generator_RowChangedName="ChartofaccountRowChanged" msprop:Generator_RowEvArgName="ChartofaccountRowChangeEvent" msprop:Generator_RowClassName="ChartofaccountRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="MAIN_GROUP_CODE" msprop:Generator_ColumnVarNameInTable="columnMAIN_GROUP_CODE" msprop:Generator_ColumnPropNameInRow="MAIN_GROUP_CODE" msprop:Generator_ColumnPropNameInTable="MAIN_GROUP_CODEColumn" msprop:Generator_UserColumnName="MAIN_GROUP_CODE">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="MAIN_GROUP_DESC" msprop:Generator_ColumnVarNameInTable="columnMAIN_GROUP_DESC" msprop:Generator_ColumnPropNameInRow="MAIN_GROUP_DESC" msprop:Generator_ColumnPropNameInTable="MAIN_GROUP_DESCColumn" msprop:Generator_UserColumnName="MAIN_GROUP_DESC" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="SUB_GROUP_CODE" msprop:Generator_ColumnVarNameInTable="columnSUB_GROUP_CODE" msprop:Generator_ColumnPropNameInRow="SUB_GROUP_CODE" msprop:Generator_ColumnPropNameInTable="SUB_GROUP_CODEColumn" msprop:Generator_UserColumnName="SUB_GROUP_CODE">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="SUB_GROUP_DESC" msprop:Generator_ColumnVarNameInTable="columnSUB_GROUP_DESC" msprop:Generator_ColumnPropNameInRow="SUB_GROUP_DESC" msprop:Generator_ColumnPropNameInTable="SUB_GROUP_DESCColumn" msprop:Generator_UserColumnName="SUB_GROUP_DESC" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ACCOUNT_CODE" msprop:Generator_ColumnVarNameInTable="columnACCOUNT_CODE" msprop:Generator_ColumnPropNameInRow="ACCOUNT_CODE" msprop:Generator_ColumnPropNameInTable="ACCOUNT_CODEColumn" msprop:Generator_UserColumnName="ACCOUNT_CODE">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ACCOUNT_DESC" msprop:Generator_ColumnVarNameInTable="columnACCOUNT_DESC" msprop:Generator_ColumnPropNameInRow="ACCOUNT_DESC" msprop:Generator_ColumnPropNameInTable="ACCOUNT_DESCColumn" msprop:Generator_UserColumnName="ACCOUNT_DESC" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="GENERAL_LEDGER" msprop:Generator_TableClassName="GENERAL_LEDGERDataTable" msprop:Generator_TableVarName="tableGENERAL_LEDGER" msprop:Generator_TablePropName="GENERAL_LEDGER" msprop:Generator_RowDeletingName="GENERAL_LEDGERRowDeleting" msprop:Generator_RowChangingName="GENERAL_LEDGERRowChanging" msprop:Generator_RowEvHandlerName="GENERAL_LEDGERRowChangeEventHandler" msprop:Generator_RowDeletedName="GENERAL_LEDGERRowDeleted" msprop:Generator_UserTableName="GENERAL_LEDGER" msprop:Generator_RowChangedName="GENERAL_LEDGERRowChanged" msprop:Generator_RowEvArgName="GENERAL_LEDGERRowChangeEvent" msprop:Generator_RowClassName="GENERAL_LEDGERRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="VOUCHER_NO" msprop:Generator_ColumnVarNameInTable="columnVOUCHER_NO" msprop:Generator_ColumnPropNameInRow="VOUCHER_NO" msprop:Generator_ColumnPropNameInTable="VOUCHER_NOColumn" msprop:Generator_UserColumnName="VOUCHER_NO" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="VCH_DATE" msprop:Generator_ColumnVarNameInTable="columnVCH_DATE" msprop:Generator_ColumnPropNameInRow="VCH_DATE" msprop:Generator_ColumnPropNameInTable="VCH_DATEColumn" msprop:Generator_UserColumnName="VCH_DATE" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="VCH_TYPE" msprop:Generator_ColumnVarNameInTable="columnVCH_TYPE" msprop:Generator_ColumnPropNameInRow="VCH_TYPE" msprop:Generator_ColumnPropNameInTable="VCH_TYPEColumn" msprop:Generator_UserColumnName="VCH_TYPE" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ACCOUNT_CODE" msprop:Generator_ColumnVarNameInTable="columnACCOUNT_CODE" msprop:Generator_ColumnPropNameInRow="ACCOUNT_CODE" msprop:Generator_ColumnPropNameInTable="ACCOUNT_CODEColumn" msprop:Generator_UserColumnName="ACCOUNT_CODE">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ACCOUNT_DESC" msprop:Generator_ColumnVarNameInTable="columnACCOUNT_DESC" msprop:Generator_ColumnPropNameInRow="ACCOUNT_DESC" msprop:Generator_ColumnPropNameInTable="ACCOUNT_DESCColumn" msprop:Generator_UserColumnName="ACCOUNT_DESC" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="PARTICULAR" msprop:Generator_ColumnVarNameInTable="columnPARTICULAR" msprop:Generator_ColumnPropNameInRow="PARTICULAR" msprop:Generator_ColumnPropNameInTable="PARTICULARColumn" msprop:Generator_UserColumnName="PARTICULAR" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="DABIT" msprop:Generator_ColumnVarNameInTable="columnDABIT" msprop:Generator_ColumnPropNameInRow="DABIT" msprop:Generator_ColumnPropNameInTable="DABITColumn" msprop:Generator_UserColumnName="DABIT" type="xs:double" minOccurs="0" />
+              <xs:element name="CREDIT" msprop:Generator_ColumnVarNameInTable="columnCREDIT" msprop:Generator_ColumnPropNameInRow="CREDIT" msprop:Generator_ColumnPropNameInTable="CREDITColumn" msprop:Generator_UserColumnName="CREDIT" type="xs:double" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+    <xs:unique name="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:GENERAL_LEDGER" />
+      <xs:field xpath="mstns:ACCOUNT_CODE" />
+    </xs:unique>
+  </xs:element>
+</xs:schema>

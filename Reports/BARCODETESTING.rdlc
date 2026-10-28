@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2008/01/reportdefinition">
+  <DataSources>
+    <DataSource Name="DataSet_Fee_Summary_Reports">
+      <ConnectionProperties>
+        <DataProvider>System.Data.DataSet</DataProvider>
+        <ConnectString>/* Local Connection */</ConnectString>
+      </ConnectionProperties>
+      <rd:DataSourceID>a4233b21-1e3a-4178-9198-d3f68fcba103</rd:DataSourceID>
+    </DataSource>
+  </DataSources>
+  <DataSets>
+    <DataSet Name="DataSet1">
+      <Fields>
+        <Field Name="BARCODE">
+          <DataField>BARCODE</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSet_Fee_Summary_Reports</DataSourceName>
+        <CommandText>/* Local Query */</CommandText>
+      </Query>
+      <rd:DataSetInfo>
+        <rd:DataSetName>DataSet_Fee_Summary_Reports</rd:DataSetName>
+        <rd:SchemaPath>D:\Technospyre\Projects\School Management System\POF Campus IV\Campus IV\DataSet_Fee_Summary_Reports.xsd</rd:SchemaPath>
+        <rd:TableName>BARCODES</rd:TableName>
+        <rd:TableAdapterFillMethod>Fill</rd:TableAdapterFillMethod>
+        <rd:TableAdapterGetDataMethod>GetData</rd:TableAdapterGetDataMethod>
+        <rd:TableAdapterName>BARCODESTableAdapter</rd:TableAdapterName>
+      </rd:DataSetInfo>
+    </DataSet>
+  </DataSets>
+  <Body>
+    <ReportItems>
+      <Textbox Name="BARCODE">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Fields!BARCODE.Value</Value>
+                <Style>
+                  <FontFamily>BCW_Code128A_1</FontFamily>
+                  <FontSize>22pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>BARCODE</rd:DefaultName>
+        <Left>0.03125in</Left>
+        <Height>0.52083in</Height>
+        <Width>2.60417in</Width>
+        <Style>
+          <Border />
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="BARCODE2">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Fields!BARCODE.Value</Value>
+                <Style>
+                  <FontFamily>BCW_Code128A_2</FontFamily>
+                  <FontSize>22pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>BARCODE</rd:DefaultName>
+        <Top>0.64583in</Top>
+        <Left>0.03125in</Left>
+        <Height>0.625in</Height>
+        <Width>2.60417in</Width>
+        <ZIndex>1</ZIndex>
+        <Style>
+          <Border />
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="BARCODE3">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Fields!BARCODE.Value</Value>
+                <Style>
+                  <FontFamily>BCW_Code128A_3</FontFamily>
+                  <FontSize>16pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>BARCODE</rd:DefaultName>
+        <Top>1.35417in</Top>
+        <Left>0.03125in</Left>
+        <Height>0.8125in</Height>
+        <Width>2.60417in</Width>
+        <ZIndex>2</ZIndex>
+        <Style>
+          <Border />
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="BARCODE4">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Fields!BARCODE.Value</Value>
+                <Style>
+                  <FontFamily>BCW_Code128B_1</FontFamily>
+                  <FontSize>22pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>BARCODE</rd:DefaultName>
+        <Top>2.28819in</Top>
+        <Left>0.03125in</Left>
+        <Height>0.73958in</Height>
+        <Width>2.60417in</Width>
+        <ZIndex>3</ZIndex>
+        <Style>
+          <Border />
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="BARCODE5">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Fields!BARCODE.Value</Value>
+                <Style>
+                  <FontFamily>BCW_Code128B_2</FontFamily>
+                  <FontSize>18pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>BARCODE</rd:DefaultName>
+        <Top>3.13021in</Top>
+        <Left>0.03125in</Left>
+        <Height>0.61458in</Height>
+        <Width>2.60417in</Width>
+        <ZIndex>4</ZIndex>
+        <Style>
+          <Border />
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="BARCODE6">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Fields!BARCODE.Value</Value>
+                <Style>
+                  <FontFamily>BCW_Code128_3</FontFamily>
+                  <FontSize>18pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>BARCODE</rd:DefaultName>
+        <Top>3.97396in</Top>
+        <Left>0.03125in</Left>
+        <Height>0.91667in</Height>
+        <Width>2.60417in</Width>
+        <ZIndex>5</ZIndex>
+        <Style>
+          <Border />
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="BARCODE7">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Fields!BARCODE.Value</Value>
+                <Style>
+                  <FontFamily>IDAutomationHC39M Free Version</FontFamily>
+                  <FontSize>14pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>BARCODE</rd:DefaultName>
+        <Left>2.81771in</Left>
+        <Height>0.83333in</Height>
+        <Width>4.28125in</Width>
+        <ZIndex>6</ZIndex>
+        <Style>
+          <Border />
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="BARCODE8">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Fields!BARCODE.Value</Value>
+                <Style>
+                  <FontFamily>IDAutomationHC39M Free Version</FontFamily>
+                  <FontSize>12pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>BARCODE</rd:DefaultName>
+        <Top>0.95972in</Top>
+        <Left>2.81771in</Left>
+        <Height>0.73959in</Height>
+        <Width>4.28125in</Width>
+        <ZIndex>7</ZIndex>
+        <Style>
+          <Border />
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="BARCODE9">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Fields!BARCODE.Value</Value>
+                <Style>
+                  <FontFamily>IDAutomationHC39M Free Version</FontFamily>
+                  <FontSize>11pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>BARCODE</rd:DefaultName>
+        <Top>1.81875in</Top>
+        <Left>2.81771in</Left>
+        <Height>0.66667in</Height>
+        <Width>4.28125in</Width>
+        <ZIndex>8</ZIndex>
+        <Style>
+          <Border />
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="BARCODE10">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Fields!BARCODE.Value</Value>
+                <Style>
+                  <FontFamily>IDAutomationHC39M Free Version</FontFamily>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>BARCODE</rd:DefaultName>
+        <Top>2.68021in</Top>
+        <Left>2.81771in</Left>
+        <Height>0.66667in</Height>
+        <Width>4.28125in</Width>
+        <ZIndex>9</ZIndex>
+        <Style>
+          <Border />
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="BARCODE11">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Fields!BARCODE.Value</Value>
+                <Style>
+                  <FontFamily>IDAutomationHC39M Free Version</FontFamily>
+                  <FontSize>9pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>BARCODE</rd:DefaultName>
+        <Top>3.525in</Top>
+        <Left>2.81771in</Left>
+        <Height>0.66667in</Height>
+        <Width>4.28125in</Width>
+        <ZIndex>10</ZIndex>
+        <Style>
+          <Border />
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="BARCODE12">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Fields!BARCODE.Value</Value>
+                <Style>
+                  <FontFamily>IDAutomationHC39M Free Version</FontFamily>
+                  <FontSize>7pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>BARCODE</rd:DefaultName>
+        <Top>5.17708in</Top>
+        <Left>2.81771in</Left>
+        <Height>0.66667in</Height>
+        <Width>4.28125in</Width>
+        <ZIndex>11</ZIndex>
+        <Style>
+          <Border />
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="BARCODE13">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Fields!BARCODE.Value</Value>
+                <Style>
+                  <FontFamily>IDAutomationHC39M Free Version</FontFamily>
+                  <FontSize>8pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>BARCODE</rd:DefaultName>
+        <Top>4.32396in</Top>
+        <Left>2.81771in</Left>
+        <Height>0.66667in</Height>
+        <Width>4.28125in</Width>
+        <ZIndex>12</ZIndex>
+        <Style>
+          <Border />
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+    </ReportItems>
+    <Height>6.42708in</Height>
+    <Style />
+  </Body>
+  <Width>7.09896in</Width>
+  <Page>
+    <PageHeight>8.5in</PageHeight>
+    <PageWidth>11in</PageWidth>
+    <LeftMargin>1in</LeftMargin>
+    <RightMargin>1in</RightMargin>
+    <TopMargin>1in</TopMargin>
+    <BottomMargin>1in</BottomMargin>
+    <Style />
+  </Page>
+  <rd:ReportID>bb5eacca-e2fc-4f0b-9634-85fb7cdb8f3e</rd:ReportID>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+</Report>

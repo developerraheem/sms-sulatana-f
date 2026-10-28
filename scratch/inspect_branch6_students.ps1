@@ -1,0 +1,18 @@
+$conn = New-Object System.Data.SqlClient.SqlConnection("Server=(localdb)\MSSQLLocalDB;Database=SCMS_SF_TEST;Integrated Security=True;")
+$conn.Open()
+$cmd = $conn.CreateCommand()
+$cmd.CommandText = "SELECT s_id, s_name, c_id, branch_id, SessionID, SHIFT, SECTION_ID, active FROM student WHERE s_id = 88883"
+$r = $cmd.ExecuteReader()
+while ($r.Read()) {
+    Write-Host "Student 88883: c_id=$($r['c_id']) branch_id=$($r['branch_id']) SessionID=$($r['SessionID']) SHIFT=$($r['SHIFT']) SECTION_ID=$($r['SECTION_ID']) active=$($r['active'])"
+}
+$r.Close()
+
+$cmd.CommandText = "SELECT s_id, s_name, c_id, branch_id, SessionID, SHIFT, SECTION_ID, active FROM student WHERE branch_id = 6"
+$r = $cmd.ExecuteReader()
+Write-Host "`nAll students in Branch 6:"
+while ($r.Read()) {
+    Write-Host "Student $($r['s_id']): Name=$($r['s_name']) c_id=$($r['c_id']) branch_id=$($r['branch_id']) SessionID=$($r['SessionID']) SHIFT=$($r['SHIFT']) SECTION_ID=$($r['SECTION_ID']) active=$($r['active'])"
+}
+$r.Close()
+$conn.Close()
